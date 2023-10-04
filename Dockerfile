@@ -16,7 +16,6 @@ WORKDIR /app
 
 # 安装依赖
 RUN npm install
-RUN npm install express
 
 # 在每次启动时从 GitHub 更新文件
-CMD ["sh", "-c", "git pull origin main && node index.js"]
+CMD ["sh", "-c", "git pull origin main && npm install && node index.js"]
