@@ -23,20 +23,19 @@
     <div id="app">Please wait...</div>
     <script>
         window.$docsify = {
-            name: "探索之旅",
             repo: "https://github.com/Rod0320/blog",
             loadSidebar: true,
             auto2top: true,
-            themeColor: "#4C98F7",
-            // subMaxLevel: 3,
+            themeColor: "#42b983",
+            subMaxLevel: 3,
             search: {
                 paths: "auto",
                 placeholder: "搜索...",
-                noData: "No Results",
+                noData: "找不到结果",
                 depth: 1,
             },
-            // 定义所有文档打开时的前缀, 如果配置链接访问速度会有所下降
-            // basePath: 'https://raw.githubusercontent.com/Rod0320/blog/main/',
+            // 外部链接默认当前页面打开
+            externalLinkTarget: '_self',
             // 入口文件改为 /home.md
             homepage: '/home.md',
             alias: {
@@ -46,8 +45,11 @@
             requestHeaders: {
                 // "cache-control": "no-cache",
             },
-            count: {
-                position: "bottom",
+            count:{
+                countable:true,
+                fontsize:'0.9em',
+                color:'rgb(90,90,90)',
+                language:'chinese'
             }
         }
     </script>
