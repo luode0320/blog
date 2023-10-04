@@ -30,6 +30,7 @@
     * [Service Worker的应用](前端/HTML/Service%20Worker的应用.md)
     * [蒙层禁止页面滚动的方案](前端/HTML/蒙层禁止页面滚动的方案.md)
     * [SVG与foreignObject元素](前端/HTML/SVG与foreignObject元素.md)
+
   * CSS
     * [垂直居中布局](前端/CSS/布局垂直居中.md)
     * [伪类与伪元素](前端/CSS/伪类与伪元素.md)
@@ -56,6 +57,7 @@
     * [实现文字滚动播放](前端/CSS/实现文字滚动播放.md)
     * [CSS实现展开动画](前端/CSS/CSS实现展开动画.md)
     * [CSS实现渐隐渐现效果](前端/CSS/CSS实现渐隐渐现效果.md)
+
   * JavaScript
     * [手动实现AJAX](前端/JavaScript/手动实现AJAX.md)
     * [ES6新特性](前端/JavaScript/ES6新特性.md)
@@ -130,6 +132,7 @@
     * [Js实用小技巧](前端/JavaScript/Js实用小技巧.md)
     * [深入理解Js中的this](前端/JavaScript/深入理解Js中的this.md)
     * [Js中的位操作符](前端/JavaScript/Js中的位操作符.md)
+
   * Vue
     * [Vue学习笔记](前端/Vue/Vue学习笔记.md)
     * [Vue-Cli4笔记](前端/Vue/Vue-Cli4笔记.md)
@@ -166,6 +169,7 @@
     * [v-html可能导致的问题](前端/Vue/v-html可能导致的问题.md)
     * [从零搭建Vue2开发环境](其它/webpack/初探webpack之搭建Vue开发环境.md)
     * [Vue首屏性能优化组件](前端/Vue/Vue首屏性能优化组件.md)
+
   * React
     * [React生命周期](前端/React/React生命周期.md)
     * [React虚拟DOM的理解](前端/React/React虚拟DOM的理解.md)
@@ -192,6 +196,7 @@
     * [Hooks与事件绑定](前端/React/Hooks与事件绑定.md)
     * [React闭包陷阱](前端/React/React闭包陷阱.md)
     * [ReactPortals传送门](前端/React/ReactPortals传送门.md)
+
   * Browser
     * [跨域问题与解决方案](前端/Browser/跨域问题.md)
     * [XSS跨站脚本攻击](前端/Browser/XSS跨站脚本攻击.md)
@@ -233,17 +238,21 @@
     * [Event对象](前端/Browser/Event对象.md)
     * [IntersectionObserver对象](前端/Browser/IntersectionObserver对象.md)
     * [MutationObserver对象](前端/Browser/MutationObserver对象.md)
+
 * 后端
   * Java
     * [QQ小程序支付](后端/Java/QQ小程序支付.md)
+
   * PHP
     * [ThinkPHP5.0 漏洞测试](后端/PHP/ThinkPHP5.0漏洞测试.md)
     * [PHP验证码识别实例](后端/图片处理/PHP验证码识别实例.md)
+
   * 图片处理
     * [OpenCV强智教务系统验证码识别](后端/图片处理/强智教务系统验证码识别OpenCV.md)
     * [Tensorflow强智教务系统验证码识别](后端/图片处理/强智教务系统验证码识别TensorflowCNN.md)
     * [YOLOV3目标检测模型训练实例](后端/图片处理/YOLOV3目标检测.md)
     * [PHP验证码识别实例](后端/图片处理/PHP验证码识别实例.md)
+
   * 算法
     * [全排列](后端/算法/全排列.md)
     * [括号生成](后端/算法/括号生成.md)
@@ -300,7 +309,8 @@
     * [种花问题](后端/算法/种花问题.md)
     * [滑动窗口最大值](后端/算法/滑动窗口最大值.md)
     * [汇总区间](后端/算法/汇总区间.md)
-      * [替换后的最长重复字符](后端/算法/替换后的最长重复字符.md)
+    * [替换后的最长重复字符](后端/算法/替换后的最长重复字符.md)
+
   * 设计模式
     * [简单工厂模式](后端/设计模式/简单工厂模式.md)
     * [工厂方法模式](后端/设计模式/工厂方法模式.md)
@@ -340,6 +350,7 @@
     * [MVC模式](后端/设计模式/MVC模式.md)
     * [MVP模式](后端/设计模式/MVP模式.md)
     * [MVVM模式](后端/设计模式/MVVM模式.md)
+
 * 服务端
   * Linux
     * [cat命令](服务端/Linux/cat命令.md)
@@ -407,8 +418,10 @@
     * [ip命令](服务端/Linux/ip命令.md)
     * [curl命令](服务端/Linux/curl命令.md)
     * [top命令](服务端/Linux/top命令.md)
+
   * Nginx
     * [Nginx常用配置](服务端/Nginx/Nginx常用配置.md)
+
   * 环境
     * [简单安全防护](服务端/环境/简单安全防护.md)
     * [手机抓包HTTPS (Fiddler & Packet Capture.md)](服务端/环境/手机抓包HTTPS.md)
@@ -416,21 +429,26 @@
     * [发布Npm包到GitHub Packages](服务端/环境/发布Npm包到GitHub%20Packages.md)
     * [解决ufw下pptp客户端连接问题](服务端/环境/解决ufw下pptp客户端连接问题.md)
     * [建立DNS隧道绕过校园网认证](服务端/环境/建立DNS隧道绕过校园网认证.md)
+
 * 移动端
   * App
     * [Nvue/Weex](移动端/App/NvueWeex.md)
+
   * 小程序
     * [山科小站小程序](移动端/小程序/山科小站小程序.md)
     * [QQ小程序支付](后端/Java/QQ小程序支付.md)
     * [支付宝小程序user_id](移动端/小程序/支付宝小程序user_id.md)
     * [微信小程序校历组件](移动端/小程序/微信小程序校历组件.md)
     * [uniapp小程序迁移到TS](移动端/小程序/uniapp小程序迁移到TS.md)
+
 * 其它
   * Git
     * [Git常用命令](其它/Git/Git常用命令.md)
     * [Git与SVN对比](其它/Git/Git与SVN对比.md)
+
   * Chrome
     * [从零实现的Chrome扩展](其它/Chrome/从零实现的Chrome扩展.md)
+
   * 面试
     * [百度实习生前端面试](其它/面试/百度实习生前端面试.md)
     * [腾讯暑期日常实习前端面试](其它/面试/腾讯暑期日常实习前端面试.md)
