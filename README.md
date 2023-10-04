@@ -34,3 +34,15 @@ node index.js
 
 ## dokcer启动
 
+### 1.0 版本
+
+```shell
+docker pull luode0320/blog:1.0
+```
+
+### 启动:
+
+```shell
+docker run -d -p 4000:4000 luode0320/blog:1.0
+```
+
