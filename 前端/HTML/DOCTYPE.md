@@ -2,7 +2,7 @@
 `DOCTYPE`是`document type`(文档类型)的简写，在`web`设计中用来说明使用的`XHTML`或者`HTML`是什么版本。  
 `HTML5` 不基于 `SGML`，所以不需要引用 `DTD`。 
 
-`<!DOCTYPE html>`声明必须是 HTML 文档的第一行，位于 `<html>` 标签之前。   
+`<!DOCTYPE html>`声明必须是 HTML 文档的第一行，位于 `<html>` 标签之前。
 
 ```xml
 <!DOCTYPE html>
