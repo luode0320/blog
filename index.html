@@ -50,6 +50,9 @@
             },
             // 入口文件改为 /home.md
             homepage: '/HOME.md',
+            alias: {
+                "/.*/_sidebar.md": "/_sidebar.md"
+            },
             plugins: [],
             requestHeaders: {
                 // "cache-control": "no-cache",
@@ -80,7 +83,7 @@
                 icon: "./Static/png/index.svg",
                 width: 50,
                 height: 50
-            }
+            },
         }
     </script>
     <script src="./Static/docsify.min.js"></script>
