@@ -33,5 +33,6 @@ jobs:
           script: | # 远程服务器依次执行下面的命令
             docker stop luode0320/blog
             docker rm luode0320/blog
+            docker rmi luode0320/blog:latest
             docker pull luode0320/blog:latest
             docker run -d -p 4000:4000 --name luode0320/blog luode0320/blog:latest
