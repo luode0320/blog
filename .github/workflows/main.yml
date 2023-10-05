@@ -1,9 +1,14 @@
+# 此文件相当简单
+# 1. 检测到main分支有提交触发jobs任务
+# 2. 指定一个github服务器的环境ubuntu-latest
+# 3. 执行pull当前的代码到github服务器
+# 4. 直接登录docker, 并制作镜像(所有安装依赖等都写在dockerfile中, 不在此执行)
+
 name: CI/CD
-# 触发条件为 push
 on:
   push:
     branches:
-      - main
+      - main # 触发条件为 push main分支
 # 任务
 jobs:
   docker: # 描述词, 无实际意义
@@ -11,11 +16,6 @@ jobs:
     # 步骤
     steps:
       - uses: actions/checkout@v2 # 相当于执行git pull操作，以获取最新的代码
-      
-      - name: 配置依赖 # 描述词, 无实际意义
-        uses: actions/setup-node@v1 # 相当于依赖管理工具
-        with: # 配置actions/setup-node@v1的一些属性
-          node-version: 18
           
       - name: 打包镜像, 上传 Docker Hub # 描述词, 无实际意义
         run: | # 当前服务器依次执行下面的命令
