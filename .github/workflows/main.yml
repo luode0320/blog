@@ -30,7 +30,7 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: root
           password: ${{ secrets.REMOTE_PASSWORD }}
-          run: | # 远程服务器依次执行下面的命令
+          script: | # 远程服务器依次执行下面的命令
             docker stop luode0320/blog
             docker rm luode0320/blog
             docker pull luode0320/blog:latest
