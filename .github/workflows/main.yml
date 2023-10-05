@@ -18,17 +18,7 @@ jobs:
           node-version: 18
           
       - name: 打包镜像, 上传 Docker Hub # 描述词, 无实际意义
-      	# secrets要去 Settings.Actions.New repository sercret 配置k-v
         run: | # 当前服务器依次执行下面的命令
           docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
           docker build -t luode0320/blog:latest .
           docker push luode0320/blog:latest
-
-      - name: 登录服务器, 执行脚本 # 描述词, 无实际意义
-        uses: appleboy/ssh-action@master # 通过SSH登录到远程服务器
-        with: # 配置actions/setup-node@v1的一些属性
-          host: ${{ secrets.REMOTE_HOST }}
-          username: root
-          password: ${{ secrets.REMOTE_PASSWORD }}
-          run: | # 远程服务器依次执行下面的命令
-            docker run -d -p 4000:4000 luode0320/blog:latest
