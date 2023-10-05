@@ -3,6 +3,7 @@
 # 2. 指定一个github服务器的环境ubuntu-latest
 # 3. 执行pull当前的代码到github服务器
 # 4. 直接登录docker, 并制作镜像(所有安装依赖等都写在dockerfile中, 不在此执行)
+# 5. 连接远程服务器, 停止/删除容器, 重新拉取最新镜像, 启动
 
 name: CI/CD
 on:
@@ -22,3 +23,15 @@ jobs:
           docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
           docker build -t luode0320/blog:latest .
           docker push luode0320/blog:latest
+
+      - name: 登录服务器, 执行脚本 # 描述词, 无实际意义
+        uses: appleboy/ssh-action@master # 通过SSH登录到远程服务器
+        with: # 配置actions/setup-node@v1的一些属性
+          host: ${{ secrets.REMOTE_HOST }}
+          username: root
+          password: ${{ secrets.REMOTE_PASSWORD }}
+          run: | # 远程服务器依次执行下面的命令
+            docker stop luode0320/blog
+            docker rm luode0320/blog
+            docker pull luode0320/blog:latest
+            docker run -d -p 4000:4000 --name luode0320/blog luode0320/blog:latest
