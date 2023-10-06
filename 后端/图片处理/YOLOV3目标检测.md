@@ -51,28 +51,28 @@ python yolo_video.py --image
 ```
 之后会出现`Input image filename:`我是放到`./img/3.jpg`下，于是就直接将路径输入
 
-![](screenshots/2023-04-14-20-38-00.png)
+![](../../图片保存/2023-04-14-20-38-00.png)
 
 稍等一会就可以识别完成
 
-![](screenshots/2023-04-14-20-38-06.png)
+![](../../图片保存/2023-04-14-20-38-06.png)
 
 ## 模型训练
 
 ### 准备数据集
 首先需要准备好目录结构，可以在 [http://host.robots.ox.ac.uk/pascal/VOC/voc2007/](http://host.robots.ox.ac.uk/pascal/VOC/voc2007/) 中下载`VOC2007`数据集，然后删除其中所有的文件，仅保留目录结构，也可以手动建立如下目录结构    
 
-![](screenshots/2023-04-14-20-38-17.png)
+![](../../图片保存/2023-04-14-20-38-17.png)
 
 然后将所有的图片放置在`JPEGImages`目录下，然后在
 [https://github.com/tzutalin/labelImg](https://github.com/tzutalin/labelImg) 下载`labelImg`标注工具，此工具是为了将图片框选标注后生成`XML`文件，使用`labelImg`打开图片，标注好后将图片生成的`XML`文件放置于`Annotations`文件夹内，保存的名字就是图片的名字。  
 
-![](screenshots/2023-04-14-20-38-35.png)
+![](../../图片保存/2023-04-14-20-38-35.png)
 
 ### 准备训练文件
 在`VOCdevkit/VOC2007`下建立一个`python`文件，将代码写入并运行，即会在`VOCdevkit/VOC2007/ImageSets/Main`下生成四个`txt`文件  
 
-![](screenshots/2023-04-14-20-38-43.png)
+![](../../图片保存/2023-04-14-20-38-43.png)
 
 ```python
 import os
@@ -114,7 +114,7 @@ ftest.close()
 ```
 在`VOCdevkit`的上层目录，我目前的目录结构为`Train`下，建立`python`文件并运行，生成三个`txt`文件，注意，此处代码需要将`classes`更改成需要训练的类别，我只需要训练`person`一类，所以此处数组中只有`person`类别   
 
-![](screenshots/2023-04-14-20-38-51.png)
+![](../../图片保存/2023-04-14-20-38-51.png)
 
 ```python
 import xml.etree.ElementTree as ET
@@ -153,7 +153,7 @@ for year, image_set in sets:
 ```
 接下来将`Train`目录下所有的文件复制到`git clone`后的目录下，此时的文件目录结构是这样的  
 
-![](screenshots/2023-04-14-20-39-27.png)
+![](../../图片保存/2023-04-14-20-39-27.png)
 
 ### 修改参数
 此时需要修改`model_data/coco_classes.txt`与`voc_classes.txt`文件，这两个文件都是需要存放训练类别的，同样我只是训练`person`类别，此处只有一行`person`。  
@@ -404,7 +404,7 @@ if __name__ == '__main__':
 ```
 此后就需要不断开始优化参数并训练了，其实在目录中有很多文件是用不到的或者是使用一次后就一般不会再用到了，可以备份一下代码后适当精简目录结构。  
 
-![](screenshots/2023-04-14-20-49-15.png)
+![](../../图片保存/2023-04-14-20-49-15.png)
 
 ## 模型训练实例
 从百度下载了`50`张信号灯的图片作训练集，实例仅为模型训练的`Demo`，数据集比较小，相关信息仅供参考。
@@ -432,11 +432,11 @@ loss: 25.8876 - val_loss: 38.1282
 ```
 #### 原图
 
-![](screenshots/2023-04-14-20-49-23.png)
+![](../../图片保存/2023-04-14-20-49-23.png)
 
 #### 识别
 
-![](screenshots/2023-04-14-20-49-32.png)
+![](../../图片保存/2023-04-14-20-49-32.png)
 
 ### 实例代码
 ```

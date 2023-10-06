@@ -20,7 +20,7 @@ jobs:
           
       - name: 打包镜像, 上传 Docker Hub # 描述词, 无实际意义
         run: | # 当前服务器依次执行下面的命令
-          docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+          docker login -u luode0320 -p ${{ secrets.REGISTRY_PASSWORD }}
           docker build -t luode0320/blog:latest .
           docker push luode0320/blog:latest
 

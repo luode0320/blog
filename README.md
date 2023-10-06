@@ -42,5 +42,5 @@ docker pull luode0320/blog:latest
 启动:
 
 ```shell
-docker run -d -p 4000:4000 --name luode0320/blog luode0320/blog:latest
+docker run --restart=always --name blog -d -p 4000:4000 luode0320/blog:latest
 ```
