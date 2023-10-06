@@ -348,7 +348,7 @@
     * Mybatis
       * [MyBatis框架简介](后端/Java/Mybatis/1、MyBatis框架简介.md)
       * [MyBatis的优点](后端/Java/Mybatis/2、MyBatis的优点.md)
-      * [#{}和${}的区别是什么？](后端/Java/Mybatis/3、#{}和${}的区别是什么？.md)
+      * [#{}和${}的区别是什么？](后端/Java/Mybatis/3、井号和美元符号的区别是什么.md)
       * [MyBatis框架适用场合](后端/Java/Mybatis/4、MyBatis框架适用场合.md)
       * [MyBatis与Hibernate有哪些不同？](后端/Java/Mybatis/5、MyBatis与Hibernate有哪些不同？.md)
       * [整合Spring](后端/Java/Mybatis/6、整合Spring.md)
