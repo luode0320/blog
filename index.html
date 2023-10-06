@@ -22,16 +22,23 @@
 </head>
 
 <body>
-    <div id="app">加载中...</div>
+    <div id="app">加载中! 很快...</div>
     <script>
         window.$docsify = {
+            // 侧边栏左侧的logo
+            logo: './Static/png/index.svg',
+            // 侧边栏顶部的标题
+            name: 'luode',
+            // 点击标题后的跳转地址
+            nameLink: 'https://luode.vip',
+            // 右上角图标
+            repo: 'https://github.com/Rod0320/blog',
             // 侧边栏支持，默认加载的是项目根目录下的_sidebar.md文件
             loadSidebar: true,
             // 导航栏支持，默认加载的是项目根目录下的_navbar.md文件
             loadNavbar: false,
             // 封面支持，默认加载的是项目根目录下的_coverpage.md文件
             coverpage: false,
-
             // 小屏设备下合并导航栏到侧边栏
             mergeNavbar: true,
             // 其他配置选项...
@@ -41,7 +48,7 @@
             // 右侧目录的标题层级
             maxLevel: 3,
             // 左侧层级
-            subMaxLevel: 1,
+            subMaxLevel: 0,
             search: {
                 paths: "auto",
                 placeholder: "搜索...",
@@ -61,7 +68,9 @@
                 countable:true,
                 fontsize:'0.9em',
                 color:'rgb(90,90,90)',
-                language:'chinese'
+                language:'chinese',
+                position: "bottom",
+                isExpected: false,
             },
             // 章节
             pagination: {
@@ -75,14 +84,6 @@
                 position: "bottom",
                 color: "var(--theme-color,#42b983)",
                 height: "3px",
-            },
-            // 右上角图标
-            repo:'true',
-            corner: {
-                url: "https://luode.vip",
-                icon: "./Static/png/index.svg",
-                width: 50,
-                height: 50
             },
         }
     </script>
@@ -106,9 +107,6 @@
     <script src="./Static/zoom-image.min.js"></script>
     <!-- 进度条 https://github.com/HerbertHe/docsify-progress -->
     <script src="./Static/progress.min.js"></script>
-    <!-- 右上角图标 https://github.com/Koooooo-7/docsify-corner -->
-    <script src="./Static/docsify-corner.js"></script>
-    <script src="./Static/docsify-corner.min.js"></script>
     <!-- 语法高亮 https://cdn.jsdelivr.net/npm/prismjs@1/components/ -->
     <script src="./Static/language/bash.min.js"></script>
     <script src="./Static/language/go.min.js"></script>

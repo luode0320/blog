@@ -234,8 +234,6 @@ select concat('kill ',id,';') from information_schema.processlist where command=
 
 - #### 危险状态
 
-![在这里插入图片描述](E:\Typora\图片保存\1460000041688769)
-
 - `converting HEAP to MyISAM` # 查询结果太大，内存不够用了，在往磁盘上搬。
 - `Creating tmp table` # 创建了临时表，回先把数据拷贝到临时表，用完后再删除临时表。
 - `Copying to tmp table on disk` # 把内存中临时表复制到磁盘

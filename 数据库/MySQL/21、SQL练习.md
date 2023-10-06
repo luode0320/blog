@@ -648,15 +648,15 @@ alter table ads_sq_three_person_group add index idx_update_time(update_time);
 
 # EXPLAIN
 
-![image-20220323150201515](../../../图片保存\image-20220323150201515.png)
+![image-20220323150201515](../../图片保存\image-20220323150201515.png)
 
-![image-20220323150036166](../../../图片保存\image-20220323150036166.png)
+![image-20220323150036166](../../图片保存\image-20220323150036166.png)
 
 ## id列
 
 `id列相同`执行顺序由上到下 -> 依次执行
 
-![image-20220323151443499](../../../图片保存\image-20220323151443499.png)
+![image-20220323151443499](../../图片保存\image-20220323151443499.png)
 
 `id 不相同`，越大越优先；
 
@@ -666,11 +666,11 @@ alter table ads_sq_three_person_group add index idx_update_time(update_time);
 
 - 先优先级(id大小)；然后按照从上往下依次执行；
 
-![image-20220323151724221](../../../图片保存\image-20220323151724221.png)
+![image-20220323151724221](../../图片保存\image-20220323151724221.png)
 
 ## select_type列：数据读取操作的操作类型
 
-![image-20220323151845566](../../../图片保存\image-20220323151845566.png)
+![image-20220323151845566](../../图片保存\image-20220323151845566.png)
 
 -  `SIMPLE`:简单的select 查询，SQL中不包含子查询或者UNION。（**不包含子查询和union**）
 
@@ -720,7 +720,7 @@ alter table ads_sq_three_person_group add index idx_update_time(update_time);
 -  其中，system const  是理想情况，实际可以达到的：`ref > range` 
 - 出现`index > ALL`就是最差的,要优化
 
-![image-20220323152918301](../../../图片保存\image-20220323152918301.png)
+![image-20220323152918301](../../图片保存\image-20220323152918301.png)
 
 **注意： 要对type优化的前提：有索引；**
 

@@ -119,10 +119,6 @@ Query OK, 0 rows affected (0.00 sec)
 mysql>  show slave status \G;
 ```
 
-![image.png](../../../图片保存\preview)
-
-
-
 ## 2-3：测试
 
 测试的话，你可以在主服务器里面，创建一个数据库，发现从服务器里面也有了，就成功了。
@@ -192,14 +188,6 @@ mysql> STOP SLAVE;
 mysql> START SLAVE;
 ```
 
-
-
-### 5、我就我的理解画出了，主从、主从从、主主、复制的图。
-
-![image.png](../../../图片保存\preview)
-
-
-
-### 6、视频讲解
+### 5、视频讲解
 
 https://www.bilibili.com/video/BV1BK4y1t7MY/
