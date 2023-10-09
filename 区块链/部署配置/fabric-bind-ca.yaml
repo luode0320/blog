@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  xinhe-ca:
+    container_name: xinhe-ca
+    image: hyperledger/fabric-ca
+    command: sh -c 'fabric-ca-server start -d -b admin:adminpw --port 7054 --cfg.affiliations.allowremove  --cfg.identities.allowremove'
+    environment:
+      - FABRIC_CA_HOME=/data/hyperledger/fabric-ca/crypto
+      - FABRIC_CA_SERVER_HOME=/data/hyperledger/fabric-ca/crypto
+      - FABRIC_CA_CLIENT_HOME=/data/hyperledger/fabric-ca/crypto
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_CSR_HOSTS=192.168.1.13,0.0.0.0,localhost,ca.immediateca.xinhe.com
+      - FABRIC_CA_SERVER_DEBUG=true
+      - FABRIC_CA_SERVER_DB_TYPE=mysql
+      - FABRIC_CA_SERVER_DB_DATASOURCE=root:root@tcp(192.168.1.13:3306)/fabric_immediateca_ca?parseTime=true
+      - FABRIC_CA_SERVER_CSR_CN=xinhe-ca
+#      - FABRIC_CA_SERVER_INTERMEDIATE_PARENTSERVER_URL=https://admin:adminpw@192.168.1.78:7054 # 新增父级url
+#      - FABRIC_CA_SERVER_INTERMEDIATE_TLS_CERTFILES=/data/hyperledger/fabric-ca/root-tls-cert.pem # 新增父级tls
+#      - FABRIC_CA_SERVER_INTERMEDIATE_TLS_CLIENT_CERTFILE=/data/hyperledger/fabric-ca/root-ca-cert.pem # 新增父级ca
+#      - FABRIC_CA_SERVER_INTERMEDIATE_TLS_CLIENT_KEYFILE=/data/hyperledger/fabric-ca/root-priv-sk # 新增父级私钥
+    volumes:
+      - /data/hyperledger/tls-ca:/data/hyperledger/fabric-ca
+    ports:
+      - 7054:7054
