@@ -520,6 +520,24 @@
     * [Fabric网络运维](区块链/Fabric/9、Fabric网络运维.md)
     * [Fabric节点部署命令](区块链/Fabric/10、Fabric节点部署命令.md)
 
+  * **Fabric-SDK**
+    * [性能压测](区块链/Fabric-SDK/性能压测.md)
+ 
+  * **部署脚本**
+    * [节点启动脚本](区块链/部署脚本/node.sh)
+    * [CA证书脚本](区块链/部署脚本/init_ca.sh)
+    * [通道脚本](区块链/部署脚本/channel.sh)
+    * [链码脚本](区块链/部署脚本/chaincode.sh)
+
+  * **部署配置**
+    * [通道配置](区块链/部署配置/configtx.yaml)
+    * [CA容器配置](区块链/部署配置/fabric-bind-ca.yaml)
+    * [orderer0容器配置](区块链/部署配置/orderer0.yaml)
+    * [orderer1容器配置](区块链/部署配置/orderer1.yaml)
+    * [orderer2容器配置](区块链/部署配置/orderer2.yaml)
+    * [peer0容器配置](区块链/部署配置/org13-peer0.yaml)
+    * [peer1容器配置](区块链/部署配置/org13-peer1.yaml)
+     
 * 算法
   * [全排列](算法/全排列.md)
   * [括号生成](算法/括号生成.md)
