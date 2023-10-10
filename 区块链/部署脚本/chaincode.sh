@@ -229,13 +229,13 @@ commitChainCode() {
 		echo \"\"
 		echo \"$container_name提交链码... \"
 		peer lifecycle chaincode commit -o $orderer_address --channelID $channelChainCode --name $nameChainCode --version $versionChainCode --sequence $sequenceChainCode \
-		--init-required --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/msp/tlscacerts/tlsca.$dnsPath-cert.pem \
+		--init-required --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/msp/tlscacerts/* \
 		--peerAddresses $peer_names --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/$org/peers/$peer/tls/ca.crt \
 
 		if [ \"$sequenceChainCode\" = \"1\" ]; then
 			echo \"\"
 			echo \"$container_name初始化... \"
-			peer chaincode invoke -o $orderer_address --isInit --ordererTLSHostnameOverride $order --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/msp/tlscacerts/tlsca.$dnsPath-cert.pem -C $channelChainCode -n $nameChainCode --peerAddresses $peer_names --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/$org/peers/$peer/tls/ca.crt -c ${gojava}
+			peer chaincode invoke -o $orderer_address --isInit --ordererTLSHostnameOverride $order --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/msp/tlscacerts/* -C $channelChainCode -n $nameChainCode --peerAddresses $peer_names --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/$org/peers/$peer/tls/ca.crt -c ${gojava}
 		fi
     sleep 2
 		echo \"\"
