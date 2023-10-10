@@ -137,7 +137,6 @@ installChainCode() {
     echo \"$container_name批准链码... \"
     peer lifecycle chaincode approveformyorg --channelID $channelChainCode --name $nameChainCode --version $versionChainCode --init-required --package-id '${nameChainCode}${package_id}' --sequence $sequenceChainCode --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/msp/tlscacerts/* --orderer $orderer_address
 
-     查询链码就绪状态
 #    echo \"\"
 #    echo \"$container_name检测就绪状态(如果该链码在其他组织检测完成提交, 可忽略检测信息): \"
 #    peer lifecycle chaincode checkcommitreadiness --channelID $channelChainCode --name $nameChainCode --version $versionChainCode --init-required --sequence $sequenceChainCode --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/msp/tlscacerts/* --orderer $orderer_address --output json
