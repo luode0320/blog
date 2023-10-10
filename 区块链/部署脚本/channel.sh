@@ -1,10 +1,33 @@
 #!/bin/bash
 # author 罗德
 
-# 例子:
-# ./xx.sh init 通道名称 [通道模板]
-# ./xx.sh join 通道名称 
-# 根据后边的流程输入执行
+#########################################################################
+########################### ↓ 配置 ↓ #####################################
+##################### cicd一键部署配置 ##################################
+########################### ↓ 配置 ↓ #####################################
+#########################################################################
+
+# 通道名称
+channel="channel"
+
+# peer配置 -> cli容器名称|peer容器名称
+peers=(
+  "cli-org13-peer0|peer0.org13.luode.com"
+  "cli-org13-peer1|peer1.org13.luode.com"
+)
+
+# orderer配置 -> cli容器名称(任意一个可用的即可)|orderer容器名称
+orderers=(
+  "cli-org13-peer0|orderer0.luode.com"
+  "cli-org13-peer0|orderer1.luode.com"
+  "cli-org13-peer0|orderer2.luode.com"
+)
+
+#########################################################################
+########################### ↓ 配置 ↓ #####################################
+##################### 请不要修改下面的配置 ##################################
+########################### ↓ 配置 ↓ #####################################
+#########################################################################
 
 # 流程控制 init=初始化通道 join=加入通道 list=查询通道
 # json=获取通道最新配置块(1) addorg=通道添加组织(2) sign=组织签名(3) update=提交更新(4)
@@ -20,8 +43,9 @@ updateChannel=$3
 help() {
       echo "帮助: "
       echo ""
-      echo "可用参数: init, join, list, json, addorg, sign, config, update"
+      echo "可用参数: cicd, init, join, list, json, addorg, sign, config, update"
       echo ""
+      echo "一键部署新通道 ./channel.sh cicd"
       echo "初始化通道 ./channel.sh init onechannel"
       echo "加入通道 ./channel.sh join onechannel"
       echo "打印通道信息 ./channel.sh list onechannel"
@@ -39,6 +63,7 @@ initChannel() {
 
 	# 检查通道名称参数是否为空
     if [ -z "$nameChannel" ]; then
+        echo "检查通道名称"
         help
         exit 1
     fi
@@ -81,36 +106,42 @@ joinChannel() {
 ############################  参数校验 #######################################
 	checkConfigFiles
     if [ -z "$nameChannel" ]; then
+        echo "检查通道名称"
         help
         exit 1
     fi
     
 ############################  选择cli客户端工具 ################################
 	# 执行 docker 命令并输出容器名称
-	echo "运行中的客户端工具容器："
-	docker ps --format "{{.Names}}" | grep -E "^cli-"
+	if [ -z "$docker_exec" ]; then
+    echo "运行中的客户端工具容器："
+    docker ps --format "{{.Names}}" | grep -E "^cli-"
 
-	# 读取用户输入的容器名称，如果用户没有输入，则使用第一个容器名称
-	read -e -p "请选择peer客户端工具(cli-org-peer)：" input_cli_address
-	docker_exec=${input_cli_address}
-
+    # 读取用户输入的容器名称，如果用户没有输入，则使用第一个容器名称
+    read -e -p "请选择peer客户端工具(cli-org-peer)：" input_cli_address
+    docker_exec=${input_cli_address}
+  fi
 ############################  选择peer/orderer节点 ##########################
 	# 截取容器名称中的组织和 Peer 名称
 	org=$(echo $docker_exec | cut -d'-' -f2)
 	peer=$(echo $docker_exec | cut -d'-' -f3)
 
-	# 列出所有正在运行的 Docker 容器
-	docker ps --format '{{.Names}}' | grep -E "^${peer}.*${org}|^orderer"
+  if [ -z "$node_address" ]; then
+    	# 列出所有正在运行的 Docker 容器
+    	docker ps --format '{{.Names}}' | grep -E "^${peer}.*${org}|^orderer"
 
-	# 读取用户输入的容器名称
-	read -e -p "请选择输入加入的节点名称, 排序节点可在任意一个容器执行加入通道
-(多个节点名称用空格分隔):" input_node_address
-	node_address=${input_node_address}
+    	# 读取用户输入的容器名称
+    	read -e -p "请选择输入加入的节点名称, 排序节点可在任意一个容器执行加入通道
+    (多个节点名称用空格分隔):" input_node_address
+    	node_address=${input_node_address}
+  fi
+
 
 ############################  docker加入通道 ###############################
 
 	# 重启刷新挂载的文件
 	docker restart $docker_exec
+	sleep 1
 	# 同步时间
 	hwclock --hctosys
 	clock -w
@@ -151,12 +182,55 @@ joinChannel() {
 	
 }
 
+cicd(){
+    if [ -z "$channel" ]; then
+        echo "检查通道名称"
+        help
+        exit 1
+    fi
+
+    nameChannel=$channel
+    if [ -f "./channel-artifacts/${nameChannel}.tx" ]; then
+      echo "通道存在, 节点加入通道"
+    else
+      # 初始化通道
+      initChannel
+    fi
+
+    # 是否有peer节点加入
+    for key in "${peers[@]}"; do
+      # 使用冒号分隔符将域名和主机名拆分为变量
+      IFS="|" read -r cli peer <<< "$key"
+      echo "----------------"
+      echo "cli客户端: $cli"
+      echo "peer节点: $peer"
+      docker_exec=$cli
+      node_address=$peer
+      joinChannel
+    done
+
+    # 是否有orderer节点加入
+    for key in "${orderers[@]}"; do
+      # 使用冒号分隔符将域名和主机名拆分为变量
+      IFS="|" read -r cli orderer <<< "$key"
+      echo "----------------"
+      echo "cli客户端: $cli"
+      echo "orderer节点: $orderer"
+      docker_exec=$cli
+      node_address=$orderer
+      joinChannel
+    done
+
+    listChannel
+}
+
 # 获取通道最新配置块
 jsonChannel() {
 ############################  参数校验 #####################################
 	checkConfigFiles
 	# 检查通道名称参数是否为空
     if [ -z "$nameChannel" ]; then
+        echo "检查通道名称"
         help
         exit 1
     fi
@@ -211,6 +285,7 @@ addorgChannel() {
 	checkConfigFiles
 	# 检查通道名称参数是否为空
     if [ -z "$nameChannel" ]; then
+        echo "检查通道名称"
         help
         exit 1
     fi
@@ -534,17 +609,19 @@ listChannel() {
 ############################  参数校验 ###################################
 	# 检查通道名称参数是否为空
     if [ -z "$nameChannel" ]; then
+        echo "检查通道名称"
         help
         exit 1
     fi
 ############################  选择cli客户端工具 ############################
-  echo "运行中的客户端工具容器："
-	docker ps --filter "name=cli*" --format "table {{.Names}}"
+  if [ -z "$docker_exec" ]; then
+      echo "运行中的客户端工具容器："
+    	docker ps --filter "name=cli*" --format "table {{.Names}}"
 
-	# 读取用户输入的容器名称，如果用户没有输入，则使用第一个容器名称
-	read -e -p "请选择peer客户端工具(cli-org-peer)：" input_peer_address
-	docker_exec=${input_peer_address}
-
+    	# 读取用户输入的容器名称，如果用户没有输入，则使用第一个容器名称
+    	read -e -p "请选择peer客户端工具(cli-org-peer)：" input_peer_address
+    	docker_exec=${input_peer_address}
+  fi
 ############################  选择peer节点 ##################################
 	# 截取容器名称中的组织
 	org=$(echo $docker_exec | cut -d'-' -f2)
@@ -563,7 +640,7 @@ listChannel() {
 	
 	# 执行查询通道
 	docker exec -it $docker_exec bash -c "\
-		echo \"通道$nameChannel的peer节点：\"
+		echo \"加入通道$nameChannel的peer节点：\"
 		discover peers --channel $nameChannel --peerTLSCA /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/$dnsPath/users/Admin\@$dnsPath/msp/tlscacerts/* --userKey /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/$dnsPath/users/Admin@$dnsPath/msp/keystore/* --userCert /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/$dnsPath/users/Admin\@$dnsPath/msp/signcerts/* --MSP Org${node_org}MSP --server $node | jq -r '.[] | .Endpoint'
 		"
 }
@@ -609,6 +686,9 @@ elif [ $process == "update" ]; then
 elif [ $process == "list" ]; then
     #查询通道
     listChannel
+elif [ $process == "cicd" ]; then
+    #一键部署新通道
+    cicd
 else
     help
 fi

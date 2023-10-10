@@ -119,7 +119,7 @@ resettingNode() {
 	else
 		exit 1
 	fi
-    
+    listNode
     echo "重置网络完成, 你可以通过 ./xx.sh start 命令重新部署节点, 重新配置通道、链码等信息"
     read -p  $'重新start部署节点,是否继续？[y/n] ' choice
 	if [ "$choice" == "y" ]; then
@@ -132,9 +132,11 @@ resettingNode() {
 # 打开容器
 openNode() {
     if [ ${#configPaths[@]} -eq 0 ]; then
+      echo ""
       echo "运行中的客户端工具容器："
-      docker ps --filter "name=cli*" --format "table {{.Names}}"
+      docker ps --filter "name=cli*" --format "table {{.Names}}" | grep -E "^cli-*"
       # 读取用户输入的容器名称，如果用户没有输入，则使用第一个容器名称
+      echo ""
       read  -e -p "请选择peer客户端工具(cli-org-peer)：" input_container_name
       container_name=${input_container_name:-$container_name}
 
