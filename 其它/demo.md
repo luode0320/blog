@@ -1,0 +1,1 @@
+peer lifecycle chaincode approveformyorg --channelID onechannel --name onecc --version 1.0 --init-required --package-id mycc:67d6a84c73ca6251a66cc114095b8a1e629bb41a50f6d3f57464b325d6b62353 --sequence 1 --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/dns.com/orderers/orderer0.dns.com/msp/tlscacerts/tlsca.dns.com-cert.pem

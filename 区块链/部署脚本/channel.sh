@@ -12,15 +12,15 @@ channel="channel"
 
 # peer配置 -> cli容器名称|peer容器名称
 peers=(
-  "cli-org13-peer0|peer0.org13.luode.com"
-  "cli-org13-peer1|peer1.org13.luode.com"
+  "cli-org-peer0|peer0.org.dns.com"
+  "cli-org-peer1|peer1.org.dns.com"
 )
 
 # orderer配置 -> cli容器名称(任意一个可用的即可)|orderer容器名称
 orderers=(
-  "cli-org13-peer0|orderer0.luode.com"
-  "cli-org13-peer0|orderer1.luode.com"
-  "cli-org13-peer0|orderer2.luode.com"
+  "cli-org-peer0|orderer0.dns.com"
+  "cli-org-peer0|orderer1.dns.com"
+  "cli-org-peer0|orderer2.dns.com"
 )
 
 #########################################################################

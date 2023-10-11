@@ -4,30 +4,30 @@
 ###################################### 使用全局替换 ##################################################
 ####################################### ↓ 替换 ↓ ###################################################
 ###################################################################################################
-# 1. 替换使用对值整体替换, 不要单对值的某一个词做替换, 例如 peer0.org13.luode.com 不能拿其中luode单独替换
+# 1. 替换使用对值整体替换, 不要单对值的某一个词做替换, 例如 peer0.org.dns.com 不能拿其中luode单独替换
 # 2. 按照顺序替换, 先替换Org13, 再替换Org13MSP, 不能反过来。因为Org13会替换到Org13MSP的部分内容, 而Org13MSP不会替换到Org13。
 
 
 
 
-# 联盟名称: xinheKeXinLian
+# 联盟名称: union
 
-# peer组织名称: Org13
-# peer组织mspid: Org13MSP
-# peer组织证书路径(注意大小写): ./crypto-config/peerOrganizations/org13.luode.com
+# peer组织名称: Org
+# peer组织mspid: OrgMSP
+# peer组织证书路径(注意大小写): ./crypto-config/peerOrganizations/org.dns.com
 
-# peer锚节点(注意大小写): peer0.org13.luode.com
+# peer锚节点(注意大小写): peer0.org.dns.com
 # peer锚节点端口: 7150
 
 # 排序组织名称: OrdererOrg
 # 排序组织mspid: OrdererMSP
-# 排序组织证书路径: ./crypto-config/ordererOrganizations/luode.com
+# 排序组织证书路径: ./crypto-config/ordererOrganizations/dns.com
 
-# 排序节点1: orderer0.luode.com
+# 排序节点1: orderer0.dns.com
 # 排序节点1端口: 7051
-# 排序节点2: orderer1.luode.com
+# 排序节点2: orderer1.dns.com
 # 排序节点2端口: 7052
-# 排序节点3: orderer2.luode.com
+# 排序节点3: orderer2.dns.com
 # 排序节点3端口: 7053
 
 
@@ -57,7 +57,7 @@ Organizations:
     - &OrdererConfig
         Name: OrdererOrg
         ID: OrdererMSP
-        MSPDir: ./crypto-config/ordererOrganizations/luode.com/msp
+        MSPDir: ./crypto-config/ordererOrganizations/dns.com/msp
         # 定义的组织策略, 也就是权限, 包括Readers读、Writers写等
         Policies:
             # 控制谁可以 读取 通道中的交易数据
@@ -76,25 +76,25 @@ Organizations:
                 Rule: "OR('OrdererMSP.admin')"
 
     - &OrgConfig
-        Name: Org13
-        ID: Org13MSP
-        MSPDir: ./crypto-config/peerOrganizations/org13.luode.com/msp
+        Name: Org
+        ID: OrgMSP
+        MSPDir: ./crypto-config/peerOrganizations/org.dns.com/msp
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org13MSP.member')"
+                Rule: "OR('OrgMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org13MSP.member')"
+                Rule: "OR('OrgMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org13MSP.admin')"
+                Rule: "OR('OrgMSP.admin')"
             # 背书策略, 只有经过身份验证的 Peer 节点才能对交易进行背书，从而保证了交易的安全性和可信度
             Endorsement:
                 Type: Signature
-                Rule: "OR('Org13MSP.peer')"
+                Rule: "OR('OrgMSP.peer')"
         AnchorPeers:
-            -   Host: peer0.org13.luode.com  # 锚节点的host地址
+            -   Host: peer0.org.dns.com  # 锚节点的host地址
                 Port: 7150        # 锚节点开放的端口号
 
 # 定义版本的兼容情况, 会在Peer、Orderer、Channel处使用
@@ -196,7 +196,7 @@ Profiles:
     # 模板2:
     TwoOrgsChannel:
         # 通道所关联的联盟名称，Fabric无系统通道模式，不需要联盟
-        Consortium: xinheKeXinLian
+        Consortium: union
 
         # 继承ChannelDefaults 通道默认属性到该位置, 也就是Policies、Capabilities属性
         <<: *ChannelDefaults
@@ -222,9 +222,9 @@ Profiles:
                 -   <<: *OrdererConfig
             # orderer节点, 必须配置, 否则peer无法与orderer通信
             Addresses:
-                - orderer0.luode.com:7051
-                - orderer1.luode.com:7052
-                - orderer2.luode.com:7053
+                - orderer0.dns.com:7051
+                - orderer1.dns.com:7052
+                - orderer2.dns.com:7053
 
 
             # 排序节点的共识机制, 使用 etcd 作为共识存储后端, 还有单机的solo和传统的Kafka机制
@@ -234,18 +234,18 @@ Profiles:
             # 如果有多个或者很多个排序节点, 需要他们参与共识机制，那么需要在配置文件中显示地配置每个排序节点的地址和 TLS 配置
             EtcdRaft:
                 Consenters:
-                    -   Host: orderer0.luode.com
+                    -   Host: orderer0.dns.com
                         Port: 7051
-                        ClientTLSCert: ./crypto-config/ordererOrganizations/luode.com/orderers/orderer0.luode.com/tls/server.crt
-                        ServerTLSCert: ./crypto-config/ordererOrganizations/luode.com/orderers/orderer0.luode.com/tls/server.crt
-                    -   Host: orderer1.luode.com
+                        ClientTLSCert: ./crypto-config/ordererOrganizations/dns.com/orderers/orderer0.dns.com/tls/server.crt
+                        ServerTLSCert: ./crypto-config/ordererOrganizations/dns.com/orderers/orderer0.dns.com/tls/server.crt
+                    -   Host: orderer1.dns.com
                         Port: 7052
-                        ClientTLSCert: ./crypto-config/ordererOrganizations/luode.com/orderers/orderer1.luode.com/tls/server.crt
-                        ServerTLSCert: ./crypto-config/ordererOrganizations/luode.com/orderers/orderer1.luode.com/tls/server.crt
-                    -   Host: orderer2.luode.com
+                        ClientTLSCert: ./crypto-config/ordererOrganizations/dns.com/orderers/orderer1.dns.com/tls/server.crt
+                        ServerTLSCert: ./crypto-config/ordererOrganizations/dns.com/orderers/orderer1.dns.com/tls/server.crt
+                    -   Host: orderer2.dns.com
                         Port: 7053
-                        ClientTLSCert: ./crypto-config/ordererOrganizations/luode.com/orderers/orderer2.luode.com/tls/server.crt
-                        ServerTLSCert: ./crypto-config/ordererOrganizations/luode.com/orderers/orderer2.luode.com/tls/server.crt
+                        ClientTLSCert: ./crypto-config/ordererOrganizations/dns.com/orderers/orderer2.dns.com/tls/server.crt
+                        ServerTLSCert: ./crypto-config/ordererOrganizations/dns.com/orderers/orderer2.dns.com/tls/server.crt
 
                 # 选举领导者leader节点配置
                 Options:

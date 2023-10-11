@@ -19,15 +19,6 @@ configPaths=("${@:2}")
 
 # 启动节点
 startNode() {
-    if [ ${#configPaths[@]} -eq 0 ]; then
-        read -p $'没有指定要启动的节点配置文件，是否要启动当前目录下所有yaml配置\n可能会执行到不属于docker-compose的yaml配置, 输出部分异常信息？[y/n] ' choice
-        if [ "$choice" == "y" ]; then
-            configPaths=($(ls *.yaml))
-        else
-            exit 1
-        fi
-    fi
-    
     checkConfigFiles
 	for configPath in "${configPaths[@]}"; do
 		docker-compose -f "$configPath" up -d 2>&1 | grep -v -E "^WARNING: " | grep -v -E "^Found orphan containers"
@@ -51,9 +42,9 @@ stopNode() {
             exit 1
         fi
     fi
-    
+
     checkConfigFiles
-    
+
     for configPath in "${configPaths[@]}"; do
 		docker-compose -f "$configPath" stop 2>&1 | grep -v -E "^WARNING: "
 		if [ $? -eq 0 ]; then
@@ -121,12 +112,6 @@ resettingNode() {
 	fi
     listNode
     echo "重置网络完成, 你可以通过 ./xx.sh start 命令重新部署节点, 重新配置通道、链码等信息"
-    read -p  $'重新start部署节点,是否继续？[y/n] ' choice
-	if [ "$choice" == "y" ]; then
-		startNode
-	else
-		exit 1
-	fi
 }
 
 # 打开容器

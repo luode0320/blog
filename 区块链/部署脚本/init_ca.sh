@@ -22,8 +22,8 @@ CaPort="7054"
 ################peer###################
 # 定义 PeerOrgs 数组 "组织名称|域名|主机名(子域)|ca节点|组织普通用户数量(取最大值)"
 PeerOrgs=(
-  "com.luode.org13|org13.luode.com|peer0|0.0.0.0:7054|1"
-  "com.luode.org13|org13.luode.com|peer1|0.0.0.0:7054|1"
+  "com.dns.org|org.dns.com|peer0|0.0.0.0:7054|1"
+  "com.dns.org|org.dns.com|peer1|0.0.0.0:7054|1"
  )
 # 注: 一个域名下只能有一个peer组织
 #  -> org3.xinhe.com域名下存在com.xinhe.org3组织, 再次定义com.xinhe.org4会覆盖之前的com.xinhe.org3
@@ -32,9 +32,9 @@ PeerOrgs=(
 ################order##################
 # 定义 OrdererOrgs 数组 "组织名称|域名|主机名(子域)|ca节点(本机节点使用0.0.0.0,外部ca需要配置Other)|组织普通用户数量(取最大值)"
 OrdererOrgs=(
-  "com.luode.OrdererOrg|luode.com|orderer0|0.0.0.0:7054|0"
-  "com.luode.OrdererOrg|luode.com|orderer1|0.0.0.0:7054|0"
-  "com.luode.OrdererOrg|luode.com|orderer2|0.0.0.0:7054|0"
+  "com.dns.OrdererOrg|dns.com|orderer0|0.0.0.0:7054|0"
+  "com.dns.OrdererOrg|dns.com|orderer1|0.0.0.0:7054|0"
+  "com.dns.OrdererOrg|dns.com|orderer2|0.0.0.0:7054|0"
 )
 # 注: 一个域名下只能有一个orderer组织
 #  -> xinhe.com域名下存在com.xinhe.OrdererOrg1组织, 再次定义com.xinhe.OrdererOrg2会覆盖之前的com.xinhe.OrdererOrg1

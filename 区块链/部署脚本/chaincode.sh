@@ -2,7 +2,7 @@
 # author 罗德
 
 #链码源码路径
-ChainCodePath="chaincode/go/xinhe-contract-golang"
+ChainCodePath="chaincode/go/mycc.tar.gz"
 
 # 例子: 默认使用当前目录下chaincode.jar
 # ./xx.sh install 通道名称 链码名称
@@ -93,7 +93,7 @@ installChainCode() {
 	
 ############################  安装/升级链码 -> docker安装/升级链码  ###################
   # 打包安装链码
-  if [ -d "${ChainCodePath}" ]; then
+  if [ -f "${ChainCodePath}" ]; then
 		gojava="golang"
 		echo "go语言环境..."
 	else
@@ -108,16 +108,25 @@ installChainCode() {
 	# 同步时间
 	hwclock --hctosys
 	clock -w
+  if [ ${gojava} == "golang" ]; then
+      	docker exec -it $container_name bash -c "\
+      		# 安装链码
+      		echo \"$container_name安装链码... \"
+      		peer lifecycle chaincode install /opt/gopath/src/github.com/hyperledger/fabric-cluster/chaincode/go/mycc.tar.gz > /var/log/package_id.log 2>&1
+      		grep -oE ":[a-f0-9]{64}" /var/log/package_id.log | head -n 1 > /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/package_id.log
+        "
+  else
+     	docker exec -it $container_name bash -c "\
+     		# 打包java链码
+     		echo \"$container_name打包链码... \"
+     		peer lifecycle chaincode package $nameChainCode.tar.gz --path /opt/gopath/src/github.com/hyperledger/fabric-cluster/${ChainCodePath} --lang ${gojava} --label $nameChainCode
+     		# 安装链码
+     		echo \"$container_name安装链码... \"
+     		peer lifecycle chaincode install $nameChainCode.tar.gz > /var/log/package_id.log 2>&1
+     		grep -oE ":[a-f0-9]{64}" /var/log/package_id.log | head -n 1 > /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/package_id.log
+       "
+  fi
 
-	docker exec -it $container_name bash -c "\
-		# 打包java链码
-		echo \"$container_name打包链码... \"
-		peer lifecycle chaincode package $nameChainCode.tar.gz --path /opt/gopath/src/github.com/hyperledger/fabric-cluster/${ChainCodePath} --lang ${gojava} --label $nameChainCode
-		# 安装链码
-		echo \"$container_name安装链码... \"
-		peer lifecycle chaincode install $nameChainCode.tar.gz > /var/log/package_id.log 2>&1
-		grep -oE ":[a-f0-9]{64}" /var/log/package_id.log | head -n 1 > /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts/package_id.log
-  "
 	
   ############################ 选择链码  ################################################
     # 读取用户输入的容器名称
