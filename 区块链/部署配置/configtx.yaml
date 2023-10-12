@@ -12,7 +12,7 @@
 
 # 联盟名称: union
 
-# peer组织名称: Org
+# peer组织名称: OrgMSP
 # peer组织mspid: OrgMSP
 # peer组织证书路径(注意大小写): ./crypto-config/peerOrganizations/org.dns.com
 
@@ -76,7 +76,7 @@ Organizations:
                 Rule: "OR('OrdererMSP.admin')"
 
     - &OrgConfig
-        Name: Org
+        Name: OrgMSP
         ID: OrgMSP
         MSPDir: ./crypto-config/peerOrganizations/org.dns.com/msp
         Policies:

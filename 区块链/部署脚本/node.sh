@@ -42,9 +42,9 @@ stopNode() {
             exit 1
         fi
     fi
-
+    
     checkConfigFiles
-
+    
     for configPath in "${configPaths[@]}"; do
 		docker-compose -f "$configPath" stop 2>&1 | grep -v -E "^WARNING: "
 		if [ $? -eq 0 ]; then

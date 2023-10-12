@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+    mysql:
+        container_name: mysql
+        image: trusted-chain/mysql:5.7
+        environment:
+            - MYSQL_ROOT_PASSWORD=root     
+            - TZ=Asia/Shanghai
+        volumes:
+            - /apps/mysql/lib/mysql:/var/lib/mysql
+            - /apps/mysql/conf.d:/etc/mysql/conf.d
+            - /apps/mysql/my.cnf:/etc/mysql/my.cnf
+        ports:
+            - 3306:3306

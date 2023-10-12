@@ -1,49 +1,44 @@
 version: '3'
 
-#全局替换下面的k-v的value
-#域名: luode.com
-#主机名: orderer2
-#端口: 7051
-#通道配置mspid: OrdererMSP
-
 #networks:
 #    fabric_net:
 #        external: true
 
 services:
-    orderer2.luode.com:
-        container_name: orderer2.luode.com
-        image: n.cndtcloud.com/trusted-chain/xinhe/xinhe-orderer:2.4.6
+    
+    orderer2.dns.com:
+        container_name: orderer2.dns.com
+        image: trusted-chain/orderer:2.4.6
 #        networks:
 #            - fabric_net
         environment:
-            - FABRIC_LOGGING_SPEC=INFO  # 指定日志级别
-            - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0     # 服务绑定的监听地址，一般需要指定为所服务的特定网络接口的地址或全网（0.0.0.0）
-            - ORDERER_GENERAL_LISTENPORT=7053       # 服务绑定的监听端口
-#            - ORDERER_GENERAL_GENESISMETHOD=file   # 当 ORDERER_GENERAL_BOOTSTRAPMETHOD 为 file 时启用，指定创世区块类型
-#            - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block   # 指定创世区块位置
-            - ORDERER_GENERAL_LOCALMSPID=OrdererMSP     # orderer 所关联的 MSPID ，一般为所属组织名称，需要与通道配置内名称一致
-            - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp      # 本地 MSP 文件路径
-            - ORDERER_GENERAL_TLS_ENABLED=true      # 启用TLS时的相关配置
-            - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key    # Orderer 签名私钥
-            - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt   # Orderer 身份证书
-            - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]     # 信任的根证书
-#            - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1   # 要在其中复制主题的Kafka代理的数量，默认为3个
-#            - ORDERER_KAFKA_VERBOSE=true    # 启用与Kafka集群交互的日志记录
-            - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt     # 双向TLS认证时，作为客户端证书的文件路径，如果没设置会使用 TLS.Certificate
-            - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key      # 双向TLS认证时，作为客户端私钥的文件路径，如果没设置会使用 TLS.PrivateKey
-            - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]     # 信任的根证书
-#           配置无系统通道
-            - ORDERER_GENERAL_BOOTSTRAPMETHOD=none  # 当 ORDERER_GENERAL_BOOTSTRAPMETHOD 为 file 时启用，指定创世区块类型
-            - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:9443  # 管理服务监听地址
-            - ORDERER_ADMIN_TLS_ENABLED=true    # 是否启用 orderer 的管理服务面板
-            - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key      # 管理服务的私钥
-            - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt     # 管理服务的证书
-            - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]     # 管理服务的可信根证书
+            - FABRIC_LOGGING_SPEC=INFO
+            - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+            - ORDERER_GENERAL_LISTENPORT=7053
+#            - ORDERER_GENERAL_GENESISMETHOD=file
+#            - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+            - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+            - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+            - ORDERER_GENERAL_TLS_ENABLED=true
+            - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+            - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+            - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+#            - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+#            - ORDERER_KAFKA_VERBOSE=true
+            - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+            - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+            - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+            #           配置无系统通道
+            - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
+            - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:9443
+            - ORDERER_ADMIN_TLS_ENABLED=true
+            - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+            - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
             - ORDERER_ADMIN_TLS_CLIENTAUTHREQUIRED=true
-            - ORDERER_CHANNELPARTICIPATION_ENABLED=true     # 是否提供参与通道的 API
-            # metrics
-#            - ORDERER_OPERATIONS_LISTENADDRESS=orderer2.luode.com:8125
+            - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+            - ORDERER_CHANNELPARTICIPATION_ENABLED=true
+              # metrics
+#            - ORDERER_OPERATIONS_LISTENADDRESS=orderer2.dns.com:8125
 #            - ORDERER_METRICS_PROVIDER=statsd
 #            - ORDERER_METRICS_STATSD_ADDRESS=graphite:8125
 #            - ORDERER_METRICS_STATSD_NETWORK=udp
@@ -53,8 +48,10 @@ services:
         volumes:
             - /etc/localtime:/etc/localtime
 #            - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-            - ./crypto-config/ordererOrganizations/luode.com/orderers/orderer2.luode.com/msp:/var/hyperledger/orderer/msp
-            - ./crypto-config/ordererOrganizations/luode.com/orderers/orderer2.luode.com/tls/:/var/hyperledger/orderer/tls
+            - ./crypto-config/ordererOrganizations/dns.com/orderers/orderer2.dns.com/msp:/var/hyperledger/orderer/msp
+            - ./crypto-config/ordererOrganizations/dns.com/orderers/orderer2.dns.com/tls/:/var/hyperledger/orderer/tls
             - ./hyperledger/orderer2:/var/hyperledger/production
         ports:
             - 7053:7053
+
+    

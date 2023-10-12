@@ -1,20 +1,13 @@
 version: '3'
 
-#全局替换下面的k-v的value
-#域名: luode.com
-#主机名: orderer0
-#端口: 7051
-#通道配置mspid: OrdererMSP
-
-
 #networks:
 #    fabric_net:
 #        external: true
 
 services:
-    orderer0.luode.com:
-        container_name: orderer0.luode.com
-        image: n.cndtcloud.com/trusted-chain/xinhe/xinhe-orderer:2.4.6
+    orderer0.dns.com:
+        container_name: orderer0.dns.com
+        image: trusted-chain/orderer:2.4.6
 #        networks:
 #            - fabric_net
         environment:
@@ -44,18 +37,18 @@ services:
             - ORDERER_ADMIN_TLS_CLIENTAUTHREQUIRED=true
             - ORDERER_CHANNELPARTICIPATION_ENABLED=true     # 是否提供参与通道的 API
             # metrics
-#            - ORDERER_OPERATIONS_LISTENADDRESS=orderer0.luode.com:8125
+#            - ORDERER_OPERATIONS_LISTENADDRESS=orderer0.dns.com:8125
 #            - ORDERER_METRICS_PROVIDER=statsd
 #            - ORDERER_METRICS_STATSD_ADDRESS=graphite:8125
 #            - ORDERER_METRICS_STATSD_NETWORK=udp
-#            - ORDERER_METRICS_STATSD_PREFIX=orderer0
+#            - ORDERER_METRICS_STATSD_PREFIX=ORDERER0
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
         command: orderer
         volumes:
             - /etc/localtime:/etc/localtime
 #            - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-            - ./crypto-config/ordererOrganizations/luode.com/orderers/orderer0.luode.com/msp:/var/hyperledger/orderer/msp
-            - ./crypto-config/ordererOrganizations/luode.com/orderers/orderer0.luode.com/tls/:/var/hyperledger/orderer/tls
+            - ./crypto-config/ordererOrganizations/dns.com/orderers/orderer0.dns.com/msp:/var/hyperledger/orderer/msp
+            - ./crypto-config/ordererOrganizations/dns.com/orderers/orderer0.dns.com/tls/:/var/hyperledger/orderer/tls
             - ./hyperledger/orderer0:/var/hyperledger/production
         ports:
             - 7051:7051

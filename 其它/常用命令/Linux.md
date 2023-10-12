@@ -20,8 +20,8 @@ firewall-cmd --permanent --list-ports
 # 查询
 sudo firewall-cmd --add-port=80/tcp --permanent
 sudo firewall-cmd --zone=public --permanent --add-port=443/tcp
-sudo firewall-cmd --permanent --add-port=32000/tcp
-sudo firewall-cmd --permanent --add-port=32001/tcp
+sudo firewall-cmd --permanent --add-port=7051/tcp
+sudo firewall-cmd --permanent --add-port=7150/tcp
 sudo firewall-cmd --permanent --add-port=32002/tcp
 firewall-cmd --reload
 firewall-cmd --permanent --list-ports
