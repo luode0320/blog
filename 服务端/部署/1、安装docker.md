@@ -73,6 +73,21 @@ yum -y install docker-ce-24.0.6-1.el7  docker-ce-cli-24.0.6-1.el7
 Docker version 24.0.6, build ed223bc
 ```
 
+## 安装docker-compose
+
+```shell
+curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+添加执行权限
+```shell
+chmod +x /usr/local/bin/docker-compose
+```
+
+检查docker compose版本
+```shell
+docker-compose version
+```
+
 ## 设置docker服务开机启动
 
 ```shell
