@@ -18,9 +18,9 @@ peers=(
 
 # orderer配置 -> cli容器名称(任意一个可用的即可)|orderer容器名称
 orderers=(
-  "cli-org-peer0|orderer0.dns.com"
-  "cli-org-peer0|orderer1.dns.com"
-  "cli-org-peer0|orderer2.dns.com"
+  "cli-org-peer0|orderer0.dns.com:9443"
+  "cli-org-peer0|orderer1.dns.com:9444"
+  "cli-org-peer0|orderer2.dns.com:9445"
 )
 
 #########################################################################
@@ -128,17 +128,23 @@ joinChannel() {
 
   if [ -z "$node_address" ]; then
     	# 列出所有正在运行的 Docker 容器
-    	docker ps --format '{{.Names}}' | grep -E "^${peer}.*${org}|^orderer"
-
+    	docker ps --format '{{.Names}}' | grep -E "^${peer}.*${org}"
+      docker ps --format "{{.Names}} {{.Ports}}" | grep order | while read -r name ports; do
+        node_address=$(echo "$name" | awk '{print $1}')
+        node_port=$(echo "$ports" | sed 's/.*->\([0-9]*\).*/\1/g')
+        echo "$node_address:$node_port"
+      done
     	# 读取用户输入的容器名称
-    	read -e -p "请选择输入加入的节点名称, 排序节点可在任意一个容器执行加入通道
-    (多个节点名称用空格分隔):" input_node_address
+    	read -e -p "请选择输入加入的节点名称, 排序节点可在任意一个容器执行加入通道, 多个节点名称用空格分隔, orderer节点加入要带上端口
+(peer0.org.dns.com,orderer0.dns.com:9443):" input_node_address
     	node_address=${input_node_address}
   fi
 
 
 ############################  docker加入通道 ###############################
-
+	# 同步时间
+	hwclock --hctosys
+	clock -w
 	# 重启刷新挂载的文件
 	docker restart $docker_exec
 	sleep 1
@@ -150,11 +156,11 @@ joinChannel() {
 	do
 	  # 获取 ":" 之前的第二个点部分(orderer0.xinhe.com -> xinhe.com)
 	  dnsPath=$(echo $node | awk -F ':' '{print $1}' | cut -d'.' -f2- )
-
+    dnsNode=$(echo $node | awk -F ':' '{print $1}')
 	  # 获取orderer0前缀类型: orderer
 	  type_prefix=$(echo $node | cut -d'.' -f1)
 	  prefix="${type_prefix%%[0-9]*}"
-	  
+
 	  # 执行加入通道
 	  docker exec -it $docker_exec bash -c "\
 	  case $prefix in
@@ -166,16 +172,16 @@ joinChannel() {
 	  		;;
 	  	\"orderer\") 
 	  		# orderer加入通道
-	  		osnadmin channel join --channelID $nameChannel --config-block ./channel-artifacts/$nameChannel.block -o $node:9443 \
-	  		--ca-file /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$node/tls/ca.crt \
-	  		--client-cert /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$node/tls/server.crt \
-	  		--client-key /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$node/tls/server.key
+	  		osnadmin channel join --channelID $nameChannel --config-block ./channel-artifacts/$nameChannel.block -o $node \
+	  		--ca-file /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$dnsNode/tls/ca.crt \
+	  		--client-cert /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$dnsNode/tls/server.crt \
+	  		--client-key /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$dnsNode/tls/server.key
 	  		
 	  		echo \"$node加入的通道列表：\"
-	  		osnadmin channel list -o $node:9443 \
-	  		--ca-file /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$node/tls/ca.crt \
-	  		--client-cert /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$node/tls/server.crt \
-	  		--client-key /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$node/tls/server.key
+	  		osnadmin channel list -o $node \
+	  		--ca-file /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$dnsNode/tls/ca.crt \
+	  		--client-cert /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$dnsNode/tls/server.crt \
+	  		--client-key /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/$dnsPath/orderers/$dnsNode/tls/server.key
 	  		;;		
 	  esac"
 	done
@@ -254,7 +260,7 @@ jsonChannel() {
 
 	# 读取用户输入的容器名称，默认第一个
 	read -e -p "请选择通道内可执行交易的orderer节点(ip:port), 如果需要提交交易到其他服务器的排序节点, 请手动调整
-(orderer0.luode.com:7051)：" input_orderer_address
+(orderer0.dns.com:7051)：" input_orderer_address
 	orderer_address=${input_orderer_address}
 
 ############################  docker #################################

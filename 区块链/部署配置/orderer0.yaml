@@ -45,6 +45,7 @@ services:
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
         command: orderer
         volumes:
+            - /etc/hosts:/etc/hosts
             - /etc/localtime:/etc/localtime
 #            - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
             - ./crypto-config/ordererOrganizations/dns.com/orderers/orderer0.dns.com/msp:/var/hyperledger/orderer/msp
@@ -52,3 +53,4 @@ services:
             - ./hyperledger/orderer0:/var/hyperledger/production
         ports:
             - 7051:7051
+            - 9443:9443
