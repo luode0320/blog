@@ -27,6 +27,8 @@
 
 对于[Fabric](https://so.csdn.net/so/search?q=Fabric&spm=1001.2101.3001.7020)源码中密码服务的提供者BCCSP而言，其核心接口`BCCSP`的方法集，将是我们顺藤摸瓜，理解其整个结构的优质参考。
 
+`bccsp/bccsp.go`
+
 ```go
 // BCCSP 是区块链加密服务提供商，它提供密码标准和算法的实现。
 type BCCSP interface {
@@ -235,7 +237,7 @@ func initFactories(config *FactoryOpts) error {
 }
 ```
 
-在这个初始化的方法中, 我们最新看到的是`FactoryOpts`, 这很明显是一个配置信息, 我们可以自定义一些配置。
+在这个初始化的方法参数中, 我们最新看到的是`FactoryOpts`, 这很明显是一个配置信息, 我们可以自定义一些配置。
 
 ```go
 // FactoryOpts 保存用于初始化工厂实现的配置信息
@@ -261,6 +263,8 @@ type SwOpts struct {
 - 一个`Default`, 类似于name表示的string类型的名称
 - 一个`SW`, 真正的配置信息, 配置在`core.yaml/orderer.yaml`的BCCSP中
 
+
+
 然后我们看到了调用了初始化方法:
 
 ```go
@@ -281,6 +285,8 @@ type SwOpts struct {
 ```
 
 - SWFactory实现了Factory接口的Get()方法, 详细的初始化在 get 方法中
+
+
 
 ### SWFactory调用get初始化
 
@@ -407,6 +413,8 @@ func NewFileBasedKeyStore(pwd []byte, path string, readOnly bool) (bccsp.KeyStor
 
 - 此方法没有过多的内容, 主要是生成指定存放密钥文件的目录, 并不是生成真正的密钥
 
+
+
 ### 生成实例
 
 调用`NewWithParams()`方法创建swbccsp实例。这里将创建真正的CSP实例。
@@ -489,7 +497,13 @@ func NewWithParams(securityLevel int, hashFamily string, keyStore bccsp.KeyStore
 
 顺着这三个点，我们基本上可以把SW的实例化和使用方法给弄明白。
 
+
+
 #### sw包内结构：CSP
+
+> CSP 提供基于 BCCSP 接口的通用实现
+
+`bccsp/sw/impl.go`
 
 ```go
 // CSP 提供基于 BCCSP 接口的通用实现在包装纸上。
@@ -499,6 +513,15 @@ func NewWithParams(securityLevel int, hashFamily string, keyStore bccsp.KeyStore
 type CSP struct {
 	ks bccsp.KeyStore // 这个是必须的, 之前也看到了, 就是存放密钥的目录
 
+	// reflect.Type作为Key类型，是Go语言反射的经典使用方式
+	// 这样做的目的是，把一个类型和一个CSP工具给绑定在一起。
+	// 打个比方，在 NewWithParams 方法中，有这样一句AddWrapper调用
+	// swbccsp.AddWrapper(reflect.TypeOf(&bccsp.ECDSAKeyGenOpts{}), &ecdsaKeyGenerator{curve: conf.ellipticCurve})
+	// 这个就是将 ECCDSAKeyGenOpts 的Type，与ecdsa的密钥生成器绑定在了一起
+	// 这么多密码算法的密钥生成器工具，但是 KeyGen 方法只有这么一个
+	// 那么调用时具体该用哪个生成器，就靠传入的这个类型决定。
+	// 我们只需要一个传入bccsp.ECDSAKeyGenOpts类型
+	// KeyGen 方法里面会调用反射API获取reflect.Type接口类型，从而自 CSP 的KeyGeneratorsMap中找到ECDSA的生成器，其他的工具也是如此。
 	KeyGenerators map[reflect.Type]KeyGenerator // 密钥生成器
 	KeyDerivers   map[reflect.Type]KeyDeriver   // 密钥派生器
 	KeyImporters  map[reflect.Type]KeyImporter  // 密钥导入器
@@ -525,6 +548,8 @@ type CSP struct {
 - 那么调用时具体该用哪个生成器，就靠传入的这个类型决定。
 - 我们只需要一个传入`bccsp.ECDSAKeyGenOpts`类型
 - `KeyGen` 方法里面会调用反射API获取`reflect.Type`接口类型，从而自 CSP 的`KeyGeneratorsMap`中找到ECDSA的生成器，其他的工具也是如此。
+
+
 
 #### Addwrapper是做什么的
 
@@ -572,6 +597,8 @@ AddWrapper的绑定过程实际上就是如此直白。
 那么到这样初始化其实就结束了, 生成了一个CSP的实例, 并且实例绑定了众多生成器的工具实例。
 
 最后，我们再以加密为例，看看CSP的方法如何找到指定工具，并执行特定过程。
+
+
 
 #### 以加密举例
 
@@ -637,8 +664,6 @@ type CSP struct {
 3. 方法传入工具的`reflect.Type`, 获取到具体工具的实例
 4. 最后工具的实例完成各自的工作
 
-
-
 下面我们将开始分析这些工具!
 
 
@@ -650,6 +675,8 @@ type CSP struct {
 BCCSP中的密钥生成主要包括两类，其一为AES对称密钥；其二为ECDSA非对称公私钥。
 
 #### BCCSP.keyGen
+
+`bccsp/sw/impl.go`
 
 我们先看看`CSP`实例中接口方法的实现:
 
@@ -696,6 +723,8 @@ k, err = keyGenerator.KeyGen(opts)
 ```
 
 #### keyGenerator.KeyGen
+
+`bccsp/sw/keygen.go`
 
 我们来看看这个工具调用的keyGen:
 
@@ -777,48 +806,23 @@ fabric 2.4.7版本中的BCCSP有两种KeyStore
 
 #### KeyStore接口
 
-我们先看看KeyStore的结构:
+怎么找到KeyStore的入口呢? 
+
+- 其实在`BCCSP`接口中, 显示给出的与`KeyStore`密钥存储相关的只有`GetKey`方法
+- 就是获取一个已经存储的密钥, 而怎么存储的`BCCSP`接口是没有直接给出提示的
+
+我们先从`BCCSP`接口`GetKey`方法找到KeyStore的结构, 也就是`CSP`接口实例:
 
 ```go
-// fileBasedKeyStore 是一个基于文件夹的密钥库。
-// 每个密钥都存储在一个单独的文件中，该文件的名称包含密钥的 SKI 以及标识密钥类型的标志。
-// 所有的密钥都存储在其路径在初始化时 提供的 文件夹下。
-// KeyStore可以用密码初始化，这个密码用于加密和解密存储密钥的文件(给文件加密)。
-// KeyStore 只能读取，以避免密钥被覆盖。
-type fileBasedKeyStore struct {
-	path string // 密钥存储文件夹
-
-	readOnly bool // 只读, 密钥文件生成后不可更改, 避免修改出错。
-	isOpen   bool // 初始化完成标志
-
-	pwd []byte // 加密密钥文件的密码, 可以为空
-
-	// 同步锁
-	m sync.Mutex
+type CSP struct {
+	ks bccsp.KeyStore // 这个是必须的, 之前也看到了, 就是存放密钥的目录
+	...
+	KeyGenerators map[reflect.Type]KeyGenerator // 密钥生成器
+	...
 }
 ```
 
-这个结构什么时候用过呢? 当然是工厂初始化的时候, 看下面:
-
-```go
-func (f *SWFactory) Get(config *FactoryOpts) (bccsp.BCCSP, error) {
-    ...
-    // 实例化基于文件的密钥目录, 通过KeyStorePath指定密钥存放路径(只创建目录, 不创建密钥文件)。
-    fks, err := sw.NewFileBasedKeyStore(nil, swOpts.FileKeystore.KeyStorePath, false)
-    ...
-}
-
-func NewFileBasedKeyStore(pwd []byte, path string, readOnly bool) (bccsp.KeyStore, error) {
-    // 这里这里这里
-	ks := &fileBasedKeyStore{}
-	// 使用密码、文件夹路径初始化此 KeyStore 存储密钥和只读标志的位置(只创建目录, 不创建密钥文件)。
-	return ks, ks.Init(pwd, path, readOnly)
-}
-```
-
-没错, 就是之前**SWFactory调用get初始化**中使用的。
-
-KeyStore接口的方法集只有三种方法，分别为ReadOnly、GetKey和StoreKey: 
+这个`bccsp.KeyStore`就是真正的接口了, 还不算实现:
 
 ```go
 // KeyStore 表示加密密钥的存储系统。
@@ -839,6 +843,10 @@ type KeyStore interface {
 }
 ```
 
+我们从这里就可以找到存储密钥StoreKey和获取密钥GetKey的入口了: 
+
+KeyStore接口的方法集只有三种方法，分别为ReadOnly、GetKey和StoreKey: 
+
 - ReadOnly是判断这个keyStore是不是只能读，先不管他。
 
 - KeyStore的核心方法无非后面两种
@@ -849,7 +857,9 @@ type KeyStore interface {
 
 #### 存储密钥方法StoreKey
 
-> 存储密钥就是将一个密钥保存到文件夹, 注意: 它并不创建密钥, 密钥生成是KeyGenerators工具的功能
+> 存储密钥就是将一个密钥保存到文件夹, 注意: 它并不创建密钥
+>
+> 密钥生成是KeyGenerators工具的功能
 
 在密钥生成的时候, 调用了`BCCSP.keyGen`生成密钥, 并调用了存储密钥: 
 
@@ -927,15 +937,82 @@ func (ks *fileBasedKeyStore) StoreKey(k bccsp.Key) (err error) {
 }
 ```
 
-StoreKey方法会先判断密钥类型，并为每种类型选择对应的存储子方法。
+在这之前, 我们可以知道到这个`StoreKey`方法, 是接口`KeyStore`的真正实现, 并且`fileBasedKeyStore`是真正实现这个接口的实例: 
 
-这些子方法只看函数签名的话，有个共同点，那就是两个参数都是**SKI与密钥**实例。
+```go
+// fileBasedKeyStore 是一个基于文件夹的密钥库。
+// 每个密钥都存储在一个单独的文件中，该文件的名称包含密钥的 SKI 以及标识密钥类型的标志。
+// 所有的密钥都存储在其路径在初始化时 提供的 文件夹下。
+// KeyStore可以用密码初始化，这个密码用于加密和解密存储密钥的文件(给文件加密)。
+// KeyStore 只能读取，以避免密钥被覆盖。
+type fileBasedKeyStore struct {
+	path string // 密钥存储文件夹
+
+	readOnly bool // 只读, 密钥文件生成后不可更改, 避免修改出错。
+	isOpen   bool // 初始化完成标志
+
+	pwd []byte // 加密密钥文件的密码, 可以为空
+
+	// 同步锁
+	m sync.Mutex
+}
+```
+
+这个结构什么时候用过呢? 当然是工厂初始化的时候, 看下面:
+
+```go
+// 初始化的get方法, 最开始的入口
+func (f *SWFactory) Get(config *FactoryOpts) (bccsp.BCCSP, error) {
+    ...
+	// 创建KeyStore
+	var ks bccsp.KeyStore
+	switch {
+	case swOpts.FileKeystore != nil:
+		// 实例化基于文件的密钥目录, 通过KeyStorePath指定密钥存放路径(只创建目录, 不创建密钥文件)。
+		fks, err := sw.NewFileBasedKeyStore(nil, swOpts.FileKeystore.KeyStorePath, false)
+		if err != nil {
+			return nil, errors.Wrapf(err, "无法初始化软件密钥存储")
+		}
+		ks = fks
+	default:
+		// 默认为临时内存密钥存储
+		ks = sw.NewDummyKeyStore()
+	}
+
+	// 通过创建好的KeyStore，调用NewWithParams()方法获取swbccsp实例，该方法在BCCSP/sw/impl.go中
+	return sw.NewWithParams(swOpts.Security, swOpts.Hash, ks)
+}
+```
+
+其中的`sw.NewFileBasedKeyStore`方法就是使用了这个结构体
+
+```go
+func NewFileBasedKeyStore(pwd []byte, path string, readOnly bool) (bccsp.KeyStore, error) {
+    // 这里这里这里
+	ks := &fileBasedKeyStore{}
+	// 使用密码、文件夹路径初始化此 KeyStore 存储密钥和只读标志的位置(只创建目录, 不创建密钥文件)。
+	return ks, ks.Init(pwd, path, readOnly)
+}
+```
+
+没错, 就是之前**SWFactory调用get初始化**中使用的。
+
+下面, 我们来看看`StoreKey`方法的实现过程: 
+
+![image-20231019102417406](../../图片保存/image-20231019102417406.png)
+
+1. StoreKey方法会先判断密钥类型，并为每种类型选择对应的存储子方法。
+2. 这些子方法只看函数签名的话，有个共同点，那就是两个参数都是**SKI与密钥**实例。
 
 那么SKI是个什么玩意儿，又怎么获取呢? 
 
 > SKI，subject key identify主题密钥标识，顾名思义是对一个密钥的标识。
 
 看看 ECDSA 的ski到底是什么? 
+
+我们拿一个ECDSA非对称算法举例: 
+
+`bccsp/sw/ecdsakey.go`
 
 ```go
 // SKI 返回此密钥的主题密钥标识符。
@@ -954,9 +1031,9 @@ func (k *ecdsaPrivateKey) SKI() []byte {
 }
 ```
 
-可以看到用`elliptic.Marshal`说明鬼东西拿私钥的椭圆曲线、公钥的X、公钥的Y计算了什么东西。
+可以看到用`elliptic.Marshal`什么鬼东西拿私钥的椭圆曲线、公钥的X、公钥的Y计算了一个什么东西。
 
-然后做了一次hash, 基本上就是用这玩意生成了一个唯一标识, 可能后面变成密钥的文件名称(确实是文件名称的一部分),  或者其他东西也说不定。
+然后做了一次hash, 基本上就是用这玩意生成了一个唯一标识, 可能后面变成密钥的文件名称(确实是文件名称的一部分)。
 
 所以这种方法, 其实就类似于传入一个**唯一的名称和私钥的内容**, 生成一个文件罢了: 
 
@@ -966,6 +1043,8 @@ case *ecdsaPrivateKey:
     err = ks.storePrivateKey(hex.EncodeToString(k.SKI()), kk.privKey)
 }
 ```
+
+
 
 #### 保存私钥到文件
 
@@ -1078,9 +1157,15 @@ func privateKeyToPEM(privateKey interface{}, pwd []byte) ([]byte, error) {
 5. 接下来，它使用ASN.1编码将EC私钥封装为ASN.1结构，并将其转换为PKCS#8格式的字节序列。
 6. 最后，它使用`pem.EncodeToMemory`函数将PKCS#8格式的私钥转换为PEM格式，并返回PEM编码的字节序列。
 
+
+
 #### 加载读取密钥GetKey
 
-除了`StoreKey`存储之外还有一个, `GetKey`加载读取密钥
+除了`StoreKey`存储之外, `KeyStore`接口还有一个, `GetKey`加载读取密钥
+
+这个读取密码在顶级接口`BCCSP`中是显示给出来的
+
+![image-20231019102951748](../../图片保存/image-20231019102951748.png)
 
 #### BCCSP.GetKey
 
@@ -1116,13 +1201,13 @@ func (ks *fileBasedKeyStore) GetKey(ski []byte) (bccsp.Key, error) {
 		return nil, errors.New("无效SKI. 长度不能为零")
 	}
 
-	// 获取ski后缀, 这里的ski不是最原始的那个ski, 是拼接完后缀sk的文件名
+	// 获取ski后缀
 	suffix := ks.getSuffix(hex.EncodeToString(ski))
 
 	// 根据后缀不同, 执行不通的策略
 	switch suffix {
 	case "key":
-		// AES 对称密钥, 加载通用密钥
+		// 从文件夹下找到文件, AES 对称密钥, 加载通用密钥
 		key, err := ks.loadKey(hex.EncodeToString(ski))
 		if err != nil {
 			return nil, fmt.Errorf("加载失败key [%x] [%s]", ski, err)
@@ -1130,7 +1215,7 @@ func (ks *fileBasedKeyStore) GetKey(ski []byte) (bccsp.Key, error) {
 
 		return &aesPrivateKey{key, false}, nil
 	case "sk":
-		// ecdsa 私钥， 加载私钥
+		// 从文件夹下找到文件, ecdsa 私钥， 加载私钥
 		key, err := ks.loadPrivateKey(hex.EncodeToString(ski))
 		if err != nil {
 			return nil, fmt.Errorf("加载机密失败key [%x] [%s]", ski, err)
@@ -1143,7 +1228,7 @@ func (ks *fileBasedKeyStore) GetKey(ski []byte) (bccsp.Key, error) {
 			return nil, errors.New("未识别密钥类型")
 		}
 	case "pk":
-		// ecdsa 公钥，加载公钥
+		// 从文件夹下找到文件, ecdsa 公钥，加载公钥
 		key, err := ks.loadPublicKey(hex.EncodeToString(ski))
 		if err != nil {
 			return nil, fmt.Errorf("未能加载公共key [%x] [%s]", ski, err)
@@ -1162,7 +1247,13 @@ func (ks *fileBasedKeyStore) GetKey(ski []byte) (bccsp.Key, error) {
 }
 ```
 
-因为过程十分相似，就是先读文件，再从PEM解密并序列化为密钥实例这样一个过程，所以密钥的加载过程不再过多叙述。
+因为过程十分相似
+
+1. 就是先读文件
+
+2. 再从PEM解密并序列化为密钥实例这样一个过程
+
+所以密钥的加载过程不再过多叙述。
 
 ```go
 	case "sk":
@@ -1181,6 +1272,8 @@ func (ks *fileBasedKeyStore) GetKey(ski []byte) (bccsp.Key, error) {
 ```
 
 存储密钥就暂时结束了!
+
+
 
 ### 密钥导入KeyImporters
 
@@ -1222,6 +1315,8 @@ BCCSP中的密钥导入器包括多个实现，每个实现用于处理一种特
 
 ![image-20231018151923191](../../图片保存/image-20231018151923191.png)
 
+`bccsp/sw/keyimport.go`
+
 ```go
 // KeyImport x 509公钥导入选择密钥导入器
 func (ki *x509PublicKeyImportOptsKeyImporter) KeyImport(raw interface{}, opts bccsp.KeyImportOpts) (bccsp.Key, error) {
@@ -1236,7 +1331,8 @@ func (ki *x509PublicKeyImportOptsKeyImporter) KeyImport(raw interface{}, opts bc
 	// 强转公钥类型
 	switch pk := pk.(type) {
 	case *ecdsa.PublicKey:
-		// 根据 reflect.Type 从CSP实例中获取ECDSAGO的导入器实例, 并且调用其KeyImport方法
+		// 根据 reflect.Type 从CSP实例中获取ECDSAGO的导入器实例
+        // 并且ECDSAGo调用其KeyImport方法
 		return ki.bccsp.KeyImporters[reflect.TypeOf(&bccsp.ECDSAGoPublicKeyImportOpts{})].KeyImport(
 			pk,
 			&bccsp.ECDSAGoPublicKeyImportOpts{Temporary: opts.Ephemeral()})
@@ -1250,7 +1346,7 @@ func (ki *x509PublicKeyImportOptsKeyImporter) KeyImport(raw interface{}, opts bc
 }
 ```
 
-ECDSAGo公共密钥导入选择密钥导入器: 
+`ECDSAGo`公共密钥导入选择密钥导入器: 
 
 ```go
 // KeyImport ecdsa Go公共密钥导入选择密钥导入器
@@ -1274,6 +1370,8 @@ func (*ecdsaGoPublicKeyImportOptsKeyImporter) KeyImport(raw interface{}, opts bc
 5. 如果公钥的类型不是ECDSA或RSA，则返回一个错误。
 
 这块的内容听起来很复杂, 实际上不过是各自强制类型转换为能处理的实例, 然后在使用罢了。
+
+
 
 ### 密钥派生KeyDerivers
 
@@ -1352,6 +1450,12 @@ func (csp *CSP) KeyDeriv(k bccsp.Key, opts bccsp.KeyDerivOpts) (dk bccsp.Key, er
 工具实例在执行方法, 信息的主要内容都在工具实例中:
 
 ![image-20231018162321483](../../图片保存/image-20231018162321483.png)
+
+我们用派生`ECDSA`私钥举例, 其实还有`ECDSA`公钥、AES密钥等:
+
+![image-20231019103719904](../../图片保存/image-20231019103719904.png)
+
+`bccsp/sw/keyderiv.go`
 
 ```go
 // KeyDeriv ECDSA私钥派生
@@ -1454,6 +1558,8 @@ func (csp *CSP) Encrypt(k bccsp.Key, plaintext []byte, opts bccsp.EncrypterOpts)
 > fabric 的 BCCSP 是没有提供非对称加密/解密的, 只提供了AES的对称加密/解密
 >
 > 非对称加密算法只提供了签名和验签的功能
+>
+> 所以 fabric 默认是明文传输的, 只有开启TLS之后, 才会有类似https的数据加密
 
 ![image-20231018172846875](../../图片保存/image-20231018172846875.png)
 
@@ -1481,7 +1587,7 @@ func (e *aescbcpkcs7Encryptor) Encrypt(k bccsp.Key, plaintext []byte, opts bccsp
 			return AESCBCPKCS7EncryptWithRand(o.PRNG, k.(*aesPrivateKey).privKey, plaintext)
 		}
 
-		// 如果加密选项中既没有指定IV，也没有指定PRNG，则使用默认的加密方式，调用 AESCBCPKCS7Encrypt 函数
+		// 如果加密选项中既没有指定IV，也没有指定PRNG随机，则使用默认的加密方式(默认也是伪随机数的)，调用 AESCBCPKCS7Encrypt 函数
 		return AESCBCPKCS7Encrypt(k.(*aesPrivateKey).privKey, plaintext)
 	case bccsp.AESCBCPKCS7ModeOpts:
 		// 如果加密选项是 bccsp.AESCBCPKCS7ModeOpts 类型的值，代码会将其转换为指针类型，并再次调用Encrypt函数
@@ -1509,7 +1615,7 @@ func (e *aescbcpkcs7Encryptor) Encrypt(k bccsp.Key, plaintext []byte, opts bccsp
 ```go
 // AESCBCPKCS7EncryptWithRand 结合CBC加密和PKCS7填充使用作为prng传递给函数
 func AESCBCPKCS7EncryptWithRand(prng io.Reader, key, src []byte) ([]byte, error) {
-	// 第一个填充
+    // 第一个填充: 目的是让明文长度刚好是AES块大小的倍数（通常是16字节）
 	tmp := pkcs7Padding(src)
 
 	// 然后伪随机加密
@@ -1592,6 +1698,8 @@ func (csp *CSP) Decrypt(k bccsp.Key, ciphertext []byte, opts bccsp.DecrypterOpts
 
 #### Decrypt解密
 
+加密的时候也说了, fabric只有对称加密, 非对称算法是不提供加密的: 
+
 ```go
 // Decrypt AES解密
 func (*aescbcpkcs7Decryptor) Decrypt(k bccsp.Key, ciphertext []byte, opts bccsp.DecrypterOpts) ([]byte, error) {
@@ -1669,9 +1777,10 @@ ECDSA算法和Hash算法在BCCSP的主要应用是进行签名和验签。
 
 对一段消息进行数字签名时:
 
-1. 需要先用Hash算法取得这段消息的hash摘要
+1. 服务端需要先用Hash算法取得这段消息的hash摘要
 2. 然后再用ECDSA的私钥对这段hash摘要做签名
-3. 验签时同样也是用ECDSA的公钥解签后与原文的hash摘要进行比较
+3. 将签名后的hash、ECDSA的公钥放入响应数据中
+4. 客户端验签时同样也是用ECDSA的公钥解签后与原文的hash摘要进行比较
 
 我觉得这块的东西, 对于一个正常的程序员来说, 没有必要说太多了。
 
@@ -1685,6 +1794,10 @@ ECDSA算法和Hash算法在BCCSP的主要应用是进行签名和验签。
 我们简单看看代码: 
 
 #### Hash摘要
+
+`BCCSP`接口提供了Hash的抽象方法:
+
+![image-20231019104434840](../../图片保存/image-20231019104434840.png)
 
 ```go
 // Hash 使用选项选项散列消息msg。
@@ -1712,7 +1825,9 @@ func (csp *CSP) Hash(msg []byte, opts bccsp.HashOpts) (digest []byte, err error)
 
 ![image-20231018192614748](../../图片保存/image-20231018192614748.png)
 
-hash函数应该不需要将太多了, 我把代码放上来吧:
+hash函数应该不需要讲太多了, 我把代码放上来吧:
+
+`bccsp/sw/hash.go`
 
 ```go
 // Hash 接受一个消息（msg）和哈希选项（opts），并返回对消息进行哈希后的结果
@@ -1730,6 +1845,10 @@ func (c *hasher) GetHash(opts bccsp.HashOpts) (hash.Hash, error) {
 	return c.hash(), nil
 }
 ```
+
+hash完成之后, 就是对hash进行签名了!
+
+
 
 #### 私钥签名hash
 
@@ -1778,6 +1897,8 @@ func (csp *CSP) Sign(k bccsp.Key, digest []byte, opts bccsp.SignerOpts) (signatu
 
 签名器签名`Sign`:
 
+`bccsp/sw/ecdsa.go`
+
 ```go
 func (s *ecdsaSigner) Sign(k bccsp.Key, digest []byte, opts bccsp.SignerOpts) ([]byte, error) {
     // 调用签名
@@ -1815,6 +1936,8 @@ func signECDSA(k *ecdsa.PrivateKey, digest []byte, opts bccsp.SignerOpts) ([]byt
 签名就结束了, 跟加密没太大区别, 加密不过是针对所有数据
 
 签名一般是对这个数据的hash值加密, 其他数据还是明文状态。
+
+
 
 #### 验签Verify
 
@@ -1857,6 +1980,8 @@ func (csp *CSP) Verify(k bccsp.Key, signature, digest []byte, opts bccsp.SignerO
 - 为什么有私钥和公钥的验签器呢?
 - 因为验签必须是公钥验签, 所以公钥验签器没问题
 - 但是ECDSA的特点是私钥里就包含公钥了, 所以私钥验签提取一下公钥就可以了
+
+`bccsp/sw/ecdsa.go`
 
 ```go
 // Verify 私钥验签
