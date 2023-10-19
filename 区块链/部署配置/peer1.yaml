@@ -16,6 +16,7 @@ services:
         ports:
             - 5985:5984
         volumes:
+            - /etc/hosts:/etc/hosts
             - /etc/localtime:/etc/localtime
 
     peer1.org.dns.com:
@@ -58,6 +59,7 @@ services:
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         command: peer node start
         volumes:
+            - /etc/hosts:/etc/hosts
             - /etc/localtime:/etc/localtime
             - /var/run/:/host/var/run/
             - ./crypto-config/peerOrganizations/org.dns.com/peers/peer1.org.dns.com/msp:/etc/hyperledger/fabric/msp
@@ -89,6 +91,7 @@ services:
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         command: sh -c "/usr/local/bin/configtxlator start --port=9081"
         volumes:
+            - /etc/hosts:/etc/hosts
             - /etc/localtime:/etc/localtime
             - /var/run/:/host/var/run/
             - ./chaincode/go/:/opt/gopath/src/github.com/hyperledger/fabric-cluster/chaincode/go/

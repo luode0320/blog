@@ -30,7 +30,7 @@ services:
             - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
             #           配置无系统通道
             - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
-            - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:9443
+            - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:9445
             - ORDERER_ADMIN_TLS_ENABLED=true
             - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
             - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
@@ -46,6 +46,7 @@ services:
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
         command: orderer
         volumes:
+            - /etc/hosts:/etc/hosts
             - /etc/localtime:/etc/localtime
 #            - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
             - ./crypto-config/ordererOrganizations/dns.com/orderers/orderer2.dns.com/msp:/var/hyperledger/orderer/msp
@@ -53,5 +54,6 @@ services:
             - ./hyperledger/orderer2:/var/hyperledger/production
         ports:
             - 7053:7053
+            - 9445:9445
 
     

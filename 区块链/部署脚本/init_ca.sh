@@ -69,7 +69,8 @@ envCa(){
 registerUser() {
     envCa
     rm -rf ${CaHome}/admin/
-		fabric-ca-client enroll -d -u https://${CaUserName}:${CaPassWord}@${CaHostname}:${CaPort} 2>&1 | grep -E "^Error: " | grep -v -E "already exists|already registered"
+    chmod -R 777 /data/hyperledger/offlineInstaller
+	fabric-ca-client enroll -d -u https://${CaUserName}:${CaPassWord}@${CaHostname}:${CaPort} 2>&1 | grep -E "^Error: " | grep -v -E "already exists|already registered"
 }
 
 # 查询ca服务器私钥, 并重命名私钥
