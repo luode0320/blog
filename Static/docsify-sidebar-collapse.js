@@ -215,7 +215,6 @@
       document.body.onclick = content.onclick = function (e) {
         if (e.target === document.body || e.currentTarget === content) {
             // if (localStorage.getItem(PIN) === 'true') {
-              console.log(555555)
               togglePin();
             // }
         }
