@@ -391,13 +391,13 @@ invokeChainCode() {
 	echo "正在运行的 orderer 排序节点："
 	docker ps --format "{{.Names}} {{.Ports}}" | grep order | while read -r name ports; do
 		node_address=$(echo "$name" | awk '{print $1}')
-		node_port=$(echo "$ports" | sed 's/.*->\([0-9]*\).*/\1/g')
+		node_port=$(echo "$ports" | awk -F "->|/" '{for(i=1; i<=NF; i++) if($i ~ /^[0-9]+$/) {print $i; break}}')
 		echo "$node_address:$node_port"
 	done
 
 	# 读取用户输入的容器名称，默认第一个
 	read -e -p "请选择通道内可执行交易的orderer节点(ip:port), 如果需要提交交易到其他服务器的排序节点, 请手动调整
-(orderer0.luode.com:7051)：" input_orderer_address
+(orderer0.dns.com:7051)：" input_orderer_address
 	orderer_address=${input_orderer_address}
 
 ############################  调用链码 -> docker调用链码  ############################################################
