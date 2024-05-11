@@ -41,3 +41,32 @@ Trying 192.168.87.128...
 Connected to 192.168.87.128.  # 表示端口已经开放
 ```
 
+# 网络配置
+
+cat /etc/sysconfig/network-scripts/ifcfg-ens32
+
+```
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=dhcp
+DEFROUTE=yes
+#IPV4_FAILURE_FATAL=no
+$IPV6INIT=yes
+$IPV6_AUTOCONF=yes
+$IPV6_DEFROUTE=yes
+$IPV6_FAILURE_FATAL=no
+$IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=ens32
+DEVICE=ens32
+ONBOOT=yes
+IPV6_PRIVACY=no
+IPADDR=192.168.2.22
+NETWASK=255.255.255.0
+GATEWAY=192.168.2.2
+DNS1=114.114.114.114
+DNS2=8.8.8.8
+```
+
+
+

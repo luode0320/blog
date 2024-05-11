@@ -30,6 +30,7 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: root
           password: ${{ secrets.REMOTE_PASSWORD }}
+          port: 10022
           script: | # 远程服务器依次执行下面的命令, 删除容器, 删除镜像, 拉取最新镜像, 启动blog容器
             docker stop blog 
             docker rm blog
