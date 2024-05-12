@@ -12,10 +12,6 @@
 
 </div>
 
-# 原作者
-
-[https://github.com/WindrunnerMax/EveryDay](https://github.com/WindrunnerMax/EveryDay)
-
 # 启动
 
 ## 本地启动
