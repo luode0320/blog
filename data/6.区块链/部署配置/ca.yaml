@@ -1,0 +1,20 @@
+version: '3'
+
+
+services:
+    ca:
+        container_name: ca
+        image: trusted-chain/ca:latest
+        command: sh -c 'fabric-ca-server start -d -b admin:adminpw --port 7054 --cfg.affiliations.allowremove  --cfg.identities.allowremove'
+        environment:
+            - FABRIC_CA_SERVER_HOME=/data/hyperledger/fabric-ca/crypto
+            - FABRIC_CA_SERVER_TLS_ENABLED=true
+            - FABRIC_CA_SERVER_CSR_CN=ca
+            - FABRIC_CA_SERVER_CSR_HOSTS=0.0.0.0,localhost,ca,6.6.6.6
+            - FABRIC_CA_SERVER_DEBUG=true
+            - FABRIC_CA_SERVER_DB_TYPE=mysql
+            - FABRIC_CA_SERVER_DB_DATASOURCE=root:root@tcp(6.6.6.6:3306)/trustedchain_ca?parseTime=true
+        volumes:
+            - /data/hyperledger/tls-ca:/data/hyperledger/fabric-ca
+        ports:
+            - 7054:7054
