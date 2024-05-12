@@ -32,8 +32,11 @@ jobs:
           password: ${{ secrets.REMOTE_PASSWORD }}
           port: 10022 # 公网22端口
           script: | # 远程服务器依次执行下面的命令, 删除容器, 删除镜像, 拉取最新镜像, 启动blog容器
-            docker stop blog 
-            docker rm blog
+            rm -R -f /usr/local/src/blog/data
+            docker rm -f blog
             docker rmi luode0320/blog:latest
             docker pull luode0320/blog:latest
+            docker run --restart=always --name blog -d -p 4000:4000 luode0320/blog:latest
+            docker cp blog:/app/data /usr/local/src/blog/data
+            docker rm -f blog
             docker run --restart=always --name blog -d -p 4000:4000 -v /usr/local/src/blog/data:/app/data luode0320/blog:latest
