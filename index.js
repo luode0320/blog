@@ -27,9 +27,16 @@ function generateMarkdown(dir, indent = '') {
         const stats = fs.statSync(filePath);
 
         if (stats.isDirectory()) {
+            markdownSub = generateMarkdown(filePath, `${indent}  `);
+            if (markdownSub === '' || !markdownSub){
+                return;
+            }
             markdown += `${indent}* **${file}**\n`;
-            markdown += generateMarkdown(filePath, `${indent}  `);
+            markdown = markdown + markdownSub
         } else {
+            if (!/\.md$/i.test(file)) {
+                return;
+            }
             const relativePath = path.relative(__dirname, filePath);
             markdown += `${indent}* [${file}](${relativePath})\n`;
         }
