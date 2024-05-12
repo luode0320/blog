@@ -14,30 +14,29 @@
 
 # 启动
 
-## 本地启动
-
-### 安装依赖
+## 安装依赖
 
 ```shell
 npm install
 ```
 
-### 执行
+## 执行
 ```shell
 node index.js 
 ```
 
 # 提交
 
-本人的所有项目均提供自动打包docker一键部署到公网服务器
-如果不需要, 请注释/删除该文件
+项目提供自动打包docker一键部署到公网服务器
+
+如不需要, 请注释/删除该文件
 ```txt
 .github/workflows/main.yml
 ```
 
 # dokcer启动
 
-# latest 版本
+## latest 版本
 
 ```shell
 docker pull luode0320/blog:latest
