@@ -8,7 +8,7 @@
 [导航页](https://luode.vip) / [QQ群 542544997]()
 
 
-![index](Static/png/index.png)
+![index](./Static/png/index.png)
 
 </div>
 
