@@ -417,10 +417,29 @@
     * [updatedb命令.md](data\3.服务器\2.系统命令\updatedb命令.md)
     * [whereis命令.md](data\3.服务器\2.系统命令\whereis命令.md)
     * [which命令.md](data\3.服务器\2.系统命令\which命令.md)
-  * **3.邮件服务器**
-    * [emix.md](data\3.服务器\3.邮件服务器\emix.md)
-  * **CloudFlare**
-    * [反向代理.md](data\3.服务器\CloudFlare\反向代理.md)
+  * **3.smtp邮件服务器**
+    * [smtp.md](data\3.服务器\3.smtp邮件服务器\smtp.md)
+  * **4.个人博客系统**
+    * [安装.md](data\3.服务器\4.个人博客系统\安装.md)
+  * **5.md文档编辑系统**
+    * [安装.md](data\3.服务器\5.md文档编辑系统\安装.md)
+  * **6.postgres数据库**
+    * [安装.md](data\3.服务器\6.postgres数据库\安装.md)
+  * **7.mysql数据库**
+    * [安装.md](data\3.服务器\7.mysql数据库\安装.md)
+  * **8.kafka消息队列**
+    * [安装.md](data\3.服务器\8.kafka消息队列\安装.md)
+  * **9.redis缓存服务器**
+    * [安装.md](data\3.服务器\9.redis缓存服务器\安装.md)
+  * **10.monio文件存储**
+    * [安装.md](data\3.服务器\10.monio文件存储\安装.md)
+  * **11.frp内网穿透**
+    * [客户端.md](data\3.服务器\11.frp内网穿透\客户端.md)
+    * [服务端.md](data\3.服务器\11.frp内网穿透\服务端.md)
+  * **12.web导航页**
+    * [安装.md](data\3.服务器\12.web导航页\安装.md)
+  * **13.chatgpt前端服务**
+    * [安装.md](data\3.服务器\13.chatgpt前端服务\安装.md)
 * **4.数据库**
   * **MySQL**
     * [1、索引的基本原理.md](data\4.数据库\MySQL\1、索引的基本原理.md)
