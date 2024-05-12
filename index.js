@@ -45,7 +45,7 @@ function generateMarkdown(dir, indent = '') {
     return markdown;
 }
 
-const projectPath = path.dirname(__filename);
+const projectPath = path.join(path.dirname(__filename), 'data');
 const markdown = generateMarkdown(projectPath);
 fs.writeFileSync('_sidebar.md', markdown);
 
