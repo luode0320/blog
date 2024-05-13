@@ -13,7 +13,7 @@
 
 > 采用`Segment` + `HashEntry`的方式进行实现，结构如下：
 
-![img](../../../图片保存\5220087-8c5b0cc951e61398.png)
+![img](../../../picture\5220087-8c5b0cc951e61398.png)
 
 - ConcurrentHashMap是由`Segment数组结构`和`HashEntry数组结构(类似Map)`组成。
 - Segment是一种`可重入锁`（ReentrantLock），在ConcurrentHashMap里扮演锁的角色；HashEntry则用于存储键值对数据。
@@ -34,7 +34,7 @@
 2. 而对于锁的粒度，调整为对`每个数组元素加锁(就是对每个链表或红黑树加锁)`。
 3. ConcurrentHashMap采用 `CAS` + `Synchronized`来保证并发安全进行实现(`乐观锁+悲观锁`)
 
-![image-20220225195508378](../../../图片保存\image-20220225195508378.png)
+![image-20220225195508378](../../../picture\image-20220225195508378.png)
 
 ## ConcurrentHashMap的put实现
 

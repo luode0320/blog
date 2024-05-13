@@ -6,7 +6,7 @@
 
 *
 
-![Untitled](../../图片保存/Untitled.png)
+![Untitled](../../picture/Untitled.png)
 
 # ca.**tls:7052 - rac.org0:7053**
 

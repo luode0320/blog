@@ -19,7 +19,7 @@
 
 在`BCCSP/factory/pkcs11.go`等文件中，也可以看到类似这样的条件编译语句。
 
-![image-20231017140416177](../../图片保存/image-20231017140416177.png)
+![image-20231017140416177](../../picture/image-20231017140416177.png)
 
 由于在实际应用中没有使用密码硬件支持，所以本次实践将全部关注SW实现的分析与改造，而**忽略PKCS11实现与IDEMIX实现**。
 
@@ -69,7 +69,7 @@ type BCCSP interface {
 
 BCCSP主要提供了以下工具集来对上述方法进行支持：
 
-![image-20231017141120977](../../图片保存/image-20231017141120977.png)
+![image-20231017141120977](../../picture/image-20231017141120977.png)
 
 ## 工厂方法
 
@@ -188,7 +188,7 @@ func initBCCSP(f BCCSPFactory, config *FactoryOpts) (bccsp.BCCSP, error) {
 
 ### 是谁调用了`initBCCSP`
 
-![image-20231017144548987](../../图片保存/image-20231017144548987.png)
+![image-20231017144548987](../../picture/image-20231017144548987.png)
 
 没错, 上图很明显, 因为我们暂时不关注硬件相关的密码服务`pkcs11`
 
@@ -535,7 +535,7 @@ type CSP struct {
 
 这个CSP的结构体, 同样也实现了我们最初讲到的 `bccsp.go` 中的 BCCSP接口
 
-![image-20231017171031605](../../图片保存/image-20231017171031605.png)
+![image-20231017171031605](../../picture/image-20231017171031605.png)
 
 #### 为什么要这样写
 
@@ -638,7 +638,7 @@ SW工具集可以被划分两部分
 
 我们回顾一下最开始, BCCSP有一个顶级的接口`BCCSP`, 这里面定义所有工具的调用方法:
 
-![image-20231018113249499](../../图片保存/image-20231018113249499.png)
+![image-20231018113249499](../../picture/image-20231018113249499.png)
 
 当然这只是接口, 我们还有真正实现接口的`CSP`结构, 看到下面这个大家应该也熟悉了: 
 
@@ -999,7 +999,7 @@ func NewFileBasedKeyStore(pwd []byte, path string, readOnly bool) (bccsp.KeyStor
 
 下面, 我们来看看`StoreKey`方法的实现过程: 
 
-![image-20231019102417406](../../图片保存/image-20231019102417406.png)
+![image-20231019102417406](../../picture/image-20231019102417406.png)
 
 1. StoreKey方法会先判断密钥类型，并为每种类型选择对应的存储子方法。
 2. 这些子方法只看函数签名的话，有个共同点，那就是两个参数都是**SKI与密钥**实例。
@@ -1165,7 +1165,7 @@ func privateKeyToPEM(privateKey interface{}, pwd []byte) ([]byte, error) {
 
 这个读取密码在顶级接口`BCCSP`中是显示给出来的
 
-![image-20231019102951748](../../图片保存/image-20231019102951748.png)
+![image-20231019102951748](../../picture/image-20231019102951748.png)
 
 #### BCCSP.GetKey
 
@@ -1293,7 +1293,7 @@ BCCSP中的密钥导入器包括多个实现，每个实现用于处理一种特
 
 像我们实例化CSP的时候就有:
 
-![image-20231018150558436](../../图片保存/image-20231018150558436.png)
+![image-20231018150558436](../../picture/image-20231018150558436.png)
 
 - AES256ImportKeyOpts: AES256格式的对称加密算法
 - HMACImportKeyOpts: HMAC格式的Hash算法
@@ -1313,7 +1313,7 @@ BCCSP中的密钥导入器包括多个实现，每个实现用于处理一种特
 
 我们以X509做一个示范: 
 
-![image-20231018151923191](../../图片保存/image-20231018151923191.png)
+![image-20231018151923191](../../picture/image-20231018151923191.png)
 
 `bccsp/sw/keyimport.go`
 
@@ -1393,7 +1393,7 @@ func (*ecdsaGoPublicKeyImportOptsKeyImporter) KeyImport(raw interface{}, opts bc
 
 **AES对称密钥派生、ECDSA公钥派生、ECDSA私钥派生**
 
-![image-20231018155512314](../../图片保存/image-20231018155512314.png)
+![image-20231018155512314](../../picture/image-20231018155512314.png)
 
 这三种`ecdsaPrivateKey、ecdsaPublicKey、aesPrivateKey`均实现了`bccsp.Key`接口
 
@@ -1401,7 +1401,7 @@ func (*ecdsaGoPublicKeyImportOptsKeyImporter) KeyImport(raw interface{}, opts bc
 
 **回忆一下之前这种密钥包装是怎么生成的:** 
 
-![image-20231018155922481](../../图片保存/image-20231018155922481.png)
+![image-20231018155922481](../../picture/image-20231018155922481.png)
 
 
 
@@ -1449,11 +1449,11 @@ func (csp *CSP) KeyDeriv(k bccsp.Key, opts bccsp.KeyDerivOpts) (dk bccsp.Key, er
 
 工具实例在执行方法, 信息的主要内容都在工具实例中:
 
-![image-20231018162321483](../../图片保存/image-20231018162321483.png)
+![image-20231018162321483](../../picture/image-20231018162321483.png)
 
 我们用派生`ECDSA`私钥举例, 其实还有`ECDSA`公钥、AES密钥等:
 
-![image-20231019103719904](../../图片保存/image-20231019103719904.png)
+![image-20231019103719904](../../picture/image-20231019103719904.png)
 
 `bccsp/sw/keyderiv.go`
 
@@ -1561,7 +1561,7 @@ func (csp *CSP) Encrypt(k bccsp.Key, plaintext []byte, opts bccsp.EncrypterOpts)
 >
 > 所以 fabric 默认是明文传输的, 只有开启TLS之后, 才会有类似https的数据加密
 
-![image-20231018172846875](../../图片保存/image-20231018172846875.png)
+![image-20231018172846875](../../picture/image-20231018172846875.png)
 
 所以我们以AES举例加密:
 
@@ -1797,7 +1797,7 @@ ECDSA算法和Hash算法在BCCSP的主要应用是进行签名和验签。
 
 `BCCSP`接口提供了Hash的抽象方法:
 
-![image-20231019104434840](../../图片保存/image-20231019104434840.png)
+![image-20231019104434840](../../picture/image-20231019104434840.png)
 
 ```go
 // Hash 使用选项选项散列消息msg。
@@ -1823,7 +1823,7 @@ func (csp *CSP) Hash(msg []byte, opts bccsp.HashOpts) (digest []byte, err error)
 
 `csp.Hashers[reflect.TypeOf(opts)]`会获取注册号的hash器, 默认就是SHA256
 
-![image-20231018192614748](../../图片保存/image-20231018192614748.png)
+![image-20231018192614748](../../picture/image-20231018192614748.png)
 
 hash函数应该不需要讲太多了, 我把代码放上来吧:
 
@@ -1856,7 +1856,7 @@ BCCSP提供了一种签名器`ecdsaSigner`
 
 两种验签器`ecdsaPrivateKeyVerifier`、`ecdsaPublicKeyKeyVerifier`
 
-![image-20231018193025588](../../图片保存/image-20231018193025588.png)
+![image-20231018193025588](../../picture/image-20231018193025588.png)
 
 - `ecdsaSigner`是利用私钥签名
 - `ecdsaPrivateKeyVerifier`与`ecdsaPublicKeyKeyVerifier`都可以验签
@@ -1973,7 +1973,7 @@ func (csp *CSP) Verify(k bccsp.Key, signature, digest []byte, opts bccsp.SignerO
 
 验签器`Verify`:
 
-![image-20231018194420350](../../图片保存/image-20231018194420350.png)
+![image-20231018194420350](../../picture/image-20231018194420350.png)
 
 之前也说明了`ecdsaPrivateKeyVerifier`与`ecdsaPublicKeyKeyVerifier`都可以验签
 

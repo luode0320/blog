@@ -50,7 +50,7 @@ docker run --restart=always --name blog -d -p 4000:4000 luode0320/blog:latest
 
 ### 挂载自己的目录
 
-注: /data/图片保存 目录属于存放图片的目录, 不会展示
+注: /data/picture 目录属于存放图片的目录, 不会展示
 
 如有调整, 需要修改源码 index.js
 ```shell

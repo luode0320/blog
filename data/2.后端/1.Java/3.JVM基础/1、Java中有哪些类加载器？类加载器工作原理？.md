@@ -47,7 +47,7 @@
 >   - **.class文件解释为二进制机器码文件**时找不到.class文件
 >- `类加载器是在运行阶段`,过了编译期来到了解释阶段,类加载器工作时,就不会出现`ClassNotfoundException`了
 
-![img](../../../图片保存\aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy83NjM0MjQ1LTdiNzg4MmUxZjRlYTVkN2QucG5n)
+![img](../../../picture\aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy83NjM0MjQ1LTdiNzg4MmUxZjRlYTVkN2QucG5n)
 
 **为什么要使用这种机制?**
 

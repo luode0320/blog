@@ -12,7 +12,7 @@
 
 `bccsp/factory/opts.go`
 
-![image-20231020155830440](../../图片保存/image-20231020155830440.png)
+![image-20231020155830440](../../picture/image-20231020155830440.png)
 
 改完使用GM的加密算法:
 
@@ -32,7 +32,7 @@ func GetDefaultOpts() *FactoryOpts {
 
 ## get加密实例方法调整默认
 
-![image-20231020160054151](../../图片保存/image-20231020160054151.png)
+![image-20231020160054151](../../picture/image-20231020160054151.png)
 
 使用默认的配置加载国密:
 
@@ -62,9 +62,7 @@ func GetDefault() bccsp.BCCSP {
 
 `bccsp/factory/nopkcs11.go`
 
-
-
-![image-20231019112727604](../../图片保存/image-20231019112727604.png)
+![image-20231019112727604](../../picture/image-20231019112727604.png)
 
 补充gm实例的加载:
 

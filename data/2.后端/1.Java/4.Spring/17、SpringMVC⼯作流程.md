@@ -31,4 +31,4 @@
   - 解析成jsp丶HTML丶json丶xml等
 - DispatcherServlet **响应⽤户**。 
 
-![2021022601-05-springmvc流程图-详细](../../../图片保存\2021022601-05-springmvc流程图-详细.png)
+![2021022601-05-springmvc流程图-详细](../../../picture\2021022601-05-springmvc流程图-详细.png)

@@ -7,7 +7,7 @@ function generateMarkdown(dir, indent = '') {
     let markdown = '';
     // 自定义要排除的目录列表
     const excludeDirs = [
-        '.github','.git','.idea','node_modules','Static','node_modules', 'tmp','.gitignore','_sidebar.md','图片保存',
+        '.github', '.git', '.idea', 'node_modules', 'Static', 'node_modules', 'tmp', '.gitignore', '_sidebar.md', 'picture',
         'Dockerfile','favicon.ico','HOME.md','index.html','index.js','package.json','package-lock.json','README.md',
     ];
 
