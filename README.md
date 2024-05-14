@@ -60,3 +60,8 @@ docker run --restart=always \
 luode0320/blog:latest
 ```
 
+# 配合云文档
+
+一个简单的 Markdown、OpenAPI 文档服务器
+
+https://github.com/luode0320/blog-cloud
