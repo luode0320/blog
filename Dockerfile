@@ -6,7 +6,7 @@ FROM node:18-alpine
 
 # 复制
 COPY . /app
-COPY ./data /app/data
+COPY data/ /var/data
 
 # 设置主目录为 / app
 WORKDIR /app
@@ -15,4 +15,4 @@ WORKDIR /app
 RUN npm install
 
 # 启动
-CMD ["sh", "-c", "node index.js"]
+CMD ["sh", "-c", "cp -R /var/data /app/data && node index.js"]

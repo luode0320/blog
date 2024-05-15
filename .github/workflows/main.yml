@@ -36,7 +36,4 @@ jobs:
             docker rm -f blog
             docker rmi luode0320/blog:latest
             docker pull luode0320/blog:latest
-            docker run --restart=always --name blog -d -p 4000:4000 luode0320/blog:latest
-            docker cp blog:/app/data /usr/local/src/blog/data
-            docker rm -f blog
             docker run --restart=always --name blog -d -p 4000:4000 -v /usr/local/src/blog/data:/app/data luode0320/blog:latest
