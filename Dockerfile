@@ -15,4 +15,4 @@ WORKDIR /app
 RUN npm install
 
 # 启动
-CMD ["sh", "-c", "cp -R /var/data /app/data && node index.js"]
+CMD ["sh", "-c", "cp -R /var/data /app && node index.js"]
