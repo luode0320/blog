@@ -6,6 +6,7 @@ FROM node:18-alpine
 
 # 复制当前目录所有文件到 /aap下面
 COPY . /app
+COPY ./data /app/data
 
 # 设置主目录为 / app
 WORKDIR /app

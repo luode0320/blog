@@ -18,11 +18,27 @@ firewall-cmd --permanent --list-ports
 # 添加指定需要开放的端口
 # 重载入添加的端口
 # 查询
-sudo firewall-cmd --add-port=80/tcp --permanent
-sudo firewall-cmd --zone=public --permanent --add-port=443/tcp
-sudo firewall-cmd --permanent --add-port=7051/tcp
-sudo firewall-cmd --permanent --add-port=7150/tcp
-sudo firewall-cmd --permanent --add-port=32002/tcp
+firewall-cmd --zone=public --permanent --add-port=443/tcp
+firewall-cmd --add-port=80/tcp --permanent
+firewall-cmd --permanent --add-port=22/tcp
+firewall-cmd --permanent --add-port=10022/tcp
+firewall-cmd --permanent --add-port=1000/tcp
+firewall-cmd --permanent --add-port=1001/tcp
+firewall-cmd --permanent --add-port=2000/tcp
+firewall-cmd --permanent --add-port=12000/tcp
+firewall-cmd --permanent --add-port=3000/tcp
+firewall-cmd --permanent --add-port=13000/tcp
+firewall-cmd --permanent --add-port=3306/tcp
+firewall-cmd --permanent --add-port=13306/tcp
+firewall-cmd --permanent --add-port=4000/tcp
+firewall-cmd --permanent --add-port=14000/tcp
+firewall-cmd --permanent --add-port=7000/tcp
+firewall-cmd --permanent --add-port=7400/tcp
+firewall-cmd --permanent --add-port=17400/tcp
+firewall-cmd --permanent --add-port=5000/tcp
+firewall-cmd --permanent --add-port=15000/tcp
+firewall-cmd --permanent --add-port=5432/tcp
+firewall-cmd --permanent --add-port=15432/tcp
 firewall-cmd --reload
 firewall-cmd --permanent --list-ports
 ```
