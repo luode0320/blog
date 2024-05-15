@@ -70,3 +70,10 @@ DNS2=8.8.8.8
 
 
 
+# 磁盘
+
+```
+df -h
+du -h -d 0 /usr/local/src/sdk
+```
+
