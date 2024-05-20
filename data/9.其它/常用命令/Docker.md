@@ -22,3 +22,15 @@ docker exec -it my-container bash
 docker commit d5944567401a mssql-2019-with-cimb:1.0
 ```
 
+# 删除未使用的卷
+
+```sh
+ docker volume rm $(docker volume ls -qf dangling=true)
+```
+
+# 删除未使用的容器数据
+
+```sh
+lsof | grep deleted | grep /var/lib/docker/overlay2/
+```
+
