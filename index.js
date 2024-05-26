@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const app = express();
+
 function generateMarkdown(dir, indent = '') {
     const files = fs.readdirSync(dir);
     let markdown = '';
@@ -48,6 +49,18 @@ function generateMarkdown(dir, indent = '') {
 const projectPath = path.join(path.dirname(__filename), 'data');
 const markdown = generateMarkdown(projectPath);
 fs.writeFileSync('_sidebar.md', markdown);
+
+// 新增刷新目录接口
+app.post('/refresh-dir', (req, res) => {
+    try {
+        const markdown = generateMarkdown(projectPath);
+        fs.writeFileSync('_sidebar.md', markdown);
+        res.status(200).send('刷新目录成功.');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('刷新目录是失败.');
+    }
+});
 
 app.use(express.static(path.join(__dirname, '/')));
 const port = 4000;
