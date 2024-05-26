@@ -25,15 +25,6 @@ npm install
 node index.js 
 ```
 
-# 提交
-
-项目提供自动打包docker一键部署到公网服务器
-
-如不需要, 请注释/删除该文件
-```txt
-.github/workflows/main.yml
-```
-
 # dokcer启动
 
 ## latest 版本
