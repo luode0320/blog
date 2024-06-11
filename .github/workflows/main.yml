@@ -18,27 +18,44 @@ on:
 #      - main # 触发条件为 push main分支
 # 任务
 jobs:
-  docker: # 描述词, 无实际意义
-    runs-on: ubuntu-latest # 运行的环境
-    # 步骤
-    steps:
-      - uses: actions/checkout@v2 # 相当于执行git pull操作，以获取最新的代码
-          
-      - name: 打包镜像, 上传 Docker Hub # 描述词, 无实际意义
-        run: | # 当前服务器依次执行下面的命令
-          docker login -u luode0320 -p ${{ secrets.REGISTRY_PASSWORD }}
-          docker build -t luode0320/blog:latest .
-          docker push luode0320/blog:latest
+  deploy-to-server:
+    name: 拉取代码至服务器并构建Docker镜像
+    runs-on: ubuntu-latest
 
-      - name: 登录服务器, 执行脚本 # 描述词, 无实际意义
-        uses: appleboy/ssh-action@master # 通过SSH登录到远程服务器
-        with: # 配置actions/setup-node@v1的一些属性
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v2
+
+      - name: 通过SSH传输代码至服务器
+        uses: appleboy/scp-action@master
+        with:
           host: ${{ secrets.REMOTE_HOST }}
           username: root
           password: ${{ secrets.REMOTE_PASSWORD }}
-          port: 10022 # 公网22端口
-          script: | # 远程服务器依次执行下面的命令, 删除容器, 删除镜像, 拉取最新镜像, 启动blog容器
+          port: 10022
+          source: '.' # 当前工作目录下的所有文件
+          target: '/usr/local/src/code/blog/' # 服务器上的目标目录
+
+      - name: 在服务器上执行Docker构建
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: root
+          password: ${{ secrets.REMOTE_PASSWORD }}
+          port: 10022
+          script: |
+            # 转换到存放代码的目录
+            cd /usr/local/src/code/blog
+            # 执行Docker构建
+            docker build -t luode0320/blog:latest .
+
+            # 容器管理操作，根据需要可调整或移除这部分
             docker rm -f blog
             docker rmi luode0320/blog:latest
             docker pull luode0320/blog:latest
-            docker run --restart=always --name blog -d -p 4000:4000 -v /usr/local/src/blog/data:/app/data luode0320/blog:latest
+            docker run  -d \
+            --restart=always \
+            --name blog \
+            -p 4000:4000 \
+            -v /usr/local/src/blog/data:/app/data \
+            luode0320/blog:latest
