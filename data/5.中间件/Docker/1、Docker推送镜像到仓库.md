@@ -1,6 +1,7 @@
 # 登陆到Docker Hub
 
 ```shell
+# 登录到docker官方
 docker login -u 用户名 -p 密码
 ```
 

@@ -1,4 +1,11 @@
+# 拉取
+
+```sh
+docker pull luode0320/smtp-emix:latest
+```
+
 # 启动
+
 ```sh
 docker run --restart=always -d \
 -e "RELAY_NETWORKS=:0.0.0.0/0" \
@@ -41,7 +48,7 @@ subject = 'verification'
 message['Subject'] = Header(subject, 'utf-8')
 
 try:
-    smtpObj = smtplib.SMTP('127.0.0.1', 1000)
+    smtpObj = smtplib.SMTP('smtp.luode.vip', 1000)
     smtpObj.sendmail(sender, receivers, message.as_string())
     print ("success")
 except smtplib.SMTPException:
