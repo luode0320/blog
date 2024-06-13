@@ -1,0 +1,14 @@
+*.log
+log/
+
+*.xml
+*.iml
+*.idea
+
+*.DS_Store
+
+
+# Hugo website
+resources
+public
+data
