@@ -1,9 +1,3 @@
-# 拉取
-
-```sh
-docker pull luode0320/smtp-emix:latest
-```
-
 # 启动
 
 ```sh

@@ -1,10 +1,4 @@
 <div align="center">
-
-![index](Static/png/index.png)
-
-</div>
-
-<div align="center">
 <b>种一棵树最好的时间是十年前，其次是现在</b>
 </div>
 

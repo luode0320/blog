@@ -36,9 +36,8 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: root
           password: ${{ secrets.REMOTE_PASSWORD }}
-          port: 22 # 公网22端口
+          port: 10022 # 公网22端口
           script: | # 远程服务器依次执行下面的命令, 删除容器, 删除镜像, 拉取最新镜像, 启动blog容器
-            cd /usr/local/src/code/blog
             docker rm -f blog
             docker rmi luode0320/blog:latest
             rm -R -f /usr/local/src/blog/data
