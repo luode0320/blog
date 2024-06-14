@@ -24,11 +24,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2 # 相当于执行git pull操作，以获取最新的代码
 
-      #      - name: 打包镜像, 上传 Docker Hub # 描述词, 无实际意义
-      #        run: | # 当前服务器依次执行下面的命令
-      #          docker login -u luode0320 -p ${{ secrets.REGISTRY_PASSWORD }}
-      #          docker build -t luode0320/blog:latest .
-      #          docker push luode0320/blog:latest
+      - name: 打包镜像, 上传 Docker Hub # 描述词, 无实际意义
+        run: | # 当前服务器依次执行下面的命令
+          docker login -u luode0320 -p ${{ secrets.REGISTRY_PASSWORD }}
+          docker build -t luode0320/blog:latest .
+          docker push luode0320/blog:latest
 
       - name: 登录服务器, 执行脚本 # 描述词, 无实际意义
         uses: appleboy/ssh-action@master # 通过SSH登录到远程服务器
@@ -38,10 +38,11 @@ jobs:
           password: ${{ secrets.REMOTE_PASSWORD }}
           port: 10022 # 公网22端口
           script: | # 远程服务器依次执行下面的命令, 删除容器, 删除镜像, 拉取最新镜像, 启动blog容器
-            cd /usr/local/src/code/blog
-            git pull git@gitee.com:luode0320/blog.git
             docker rm -f blog
             docker rmi luode0320/blog:latest
-            docker login -u luode0320 -p ${{ secrets.REGISTRY_PASSWORD }}
-            docker build -t luode0320/blog:latest .
-            docker run --restart=always --name blog -d -p 4000:4000 -v /usr/local/src/blog/data:/app/data luode0320/blog:latest
+            docker run -d \
+            --restart=always \
+            --name blog \
+            -p 4000:4000 \
+            -v /usr/local/src/blog/data:/app/data \
+            luode0320/blog:latest
