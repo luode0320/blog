@@ -39,7 +39,7 @@ jobs:
           port: 10022 # 公网22端口
           script: | # 远程服务器依次执行下面的命令, 删除容器, 删除镜像, 拉取最新镜像, 启动blog容器
             cd /usr/local/src/code/blog
-            git clone git@gitee.com:luode0320/blog.git
+            git pull git@gitee.com:luode0320/blog.git
             docker rm -f blog
             docker rmi luode0320/blog:latest
             docker login -u luode0320 -p ${{ secrets.REGISTRY_PASSWORD }}
