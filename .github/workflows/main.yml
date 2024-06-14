@@ -44,4 +44,5 @@ jobs:
             docker rmi luode0320/blog:latest
             docker login -u luode0320 -p ${{ secrets.REGISTRY_PASSWORD }}
             docker build -t luode0320/blog:latest .
+            rm -R -f /usr/local/src/blog/data
             docker run --restart=always --name blog -d -p 4000:4000 -v /usr/local/src/blog/data:/app/data luode0320/blog:latest
