@@ -7,7 +7,8 @@ slug: /happens-before
 维基百科上给的定义：
 
 > In computer science, the happened-before relation (denoted: ->) is a relation between the result of two events, such
-> that if one event should happen before another event, the result must reflect that, even if those events are in reality
+> that if one event should happen before another event, the result must reflect that, even if those events are in
+> reality
 > executed out of order (usually to optimize program flow).
 
 简单来说就是如果事件 a 和事件 b 存在 happened-before 关系，即 a -> b，那么 a，b 完成后的结果一定要体现这种关系。由于现代编译器、CPU

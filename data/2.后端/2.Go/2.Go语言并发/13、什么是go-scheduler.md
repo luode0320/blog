@@ -56,7 +56,8 @@ Go scheduler 的核心思想是：
 为什么需要 P 这个组件，直接把 runqueues 放到 M 不行吗？
 
 > You might wonder now, why have contexts at all? Can't we just put the runqueues on the threads and get rid of
-> contexts? Not really. The reason we have contexts is so that we can hand them off to other threads if the running thread
+> contexts? Not really. The reason we have contexts is so that we can hand them off to other threads if the running
+> thread
 > needs to block for some reason.
 
 > An example of when we need to block, is when we call into a syscall. Since a thread cannot both be executing code and

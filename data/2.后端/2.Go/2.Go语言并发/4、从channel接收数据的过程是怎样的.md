@@ -189,6 +189,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
   closechan 函数的时候再看。
 
 -
+
 和发送函数一样，接下来搞了一个在非阻塞模式下，不用获取锁，快速检测到失败并且返回的操作。顺带插一句，我们平时在写代码的时候，找到一些边界条件，快速返回，能让代码逻辑更清晰，因为接下来的正常情况就比较少，更聚焦了，看代码的人也更能专注地看核心代码逻辑了。
 
 ```golang
