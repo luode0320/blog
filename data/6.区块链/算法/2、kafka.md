@@ -4,7 +4,9 @@
 
 
 
-**简单来说，就是通过Kafka自带的共识算法对所有交易信息进行排序。**
+**简单来说，就是通过Kafka自带的共识算法对所有交易信息进行排序 ->  KRaft 共识协议**
+
+
 
 # 工作原理
 
@@ -33,6 +35,8 @@
 - `orderer/consensus/kafka/consenter.go`: 该文件用来实例化上面chain.go的共识实例, `HandleChain`的实现也在这里
 - `orderer/consensus/kafka/channel.go`: 获取网络通道的kafka主题和分区的方法, 用于发送消息到kafka时设置主题和分区
 - `orderer/consensus/kafka/config.go`: 封装了使用Sarama创建kafka连接实例
+
+
 
 这里我要指出orderer排序节点调用它的入口函数`HandleChain`(可以不深究)
 
@@ -63,6 +67,9 @@ func (consenter *consenterImpl) HandleChain(support consensus.ConsenterSupport, 
 	consenter.healthChecker.RegisterChecker(ch.channel.String(), ch)
 	return ch, nil
 }
+```
+
+```go
 
 // newChain 用于根据提供的共识器、支持资源以及偏移量信息创建一个新的链实例。
 // 参数:
@@ -116,14 +123,17 @@ func newChain(
 		doneReprocessingMsgInFlight: doneReprocessingMsgInFlight, // 重新处理消息完成信号
 	}, nil
 }
-
 ```
+
+
 
 这是入口函数`HandleChain`, 就算是sole、reft等其他共识算法, 也是用这个方法创建我们的算法对象的
 
 然后才会使用算法对象来调用方法执行相关算法逻辑
 
 这个不用太深究, 如果需要直接研究源码, 可以从这个函数入手
+
+
 
 ## start()
 
