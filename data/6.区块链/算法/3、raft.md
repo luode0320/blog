@@ -215,6 +215,11 @@ func (c *Consenter) HandleChain(support consensus.ConsenterSupport, metadata *co
 ```
 
 - 最后的`return NewChain()`创建完成之后就会进入`Start`的核心方法了
+- 如果你需要启动debug, 就在这个`orderer/consensus/etcdraft/consenter.go/HandleChain`方法处断点即可
+
+- 如果你需要存证debug, 那么你可以通过存证一个数据在`orderer/consensus/etcdraft/chain.go/Order()`方法处断点即可
+
+
 
 ## Start()
 
