@@ -1,6 +1,8 @@
 # 简介
 
 > 在Hyperledger Fabric中，Orderer模块可以使用Solo共识机制来确保分布式系统的可靠性和一致性。
+>
+> 注意: fabric新版本已经无法使用solo和kafka的共识机制
 
 
 

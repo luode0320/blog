@@ -1,6 +1,8 @@
 # 简介
 
 > Hyperledger Fabric的核心共识算法通过Kafka集群实现
+>
+> 注意: fabric新版本已经无法使用solo和kafka的共识机制
 
 
 
