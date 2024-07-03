@@ -22,7 +22,7 @@
 
 # 结论
 
-fabric的kafka共识机制本身没有做任何排序处理, 共识和排序完全由kafka控制, 通过但主题单分区的kafka配置达成交易的共识和顺序
+fabric的kafka共识机制本身没有做任何排序处理, 共识和排序完全由kafka控制, 通过单主题单分区的kafka配置达成交易的共识和顺序
 
 fabric本身就是将接受到的消息和配置的区块最大值比较后是否需要分到下一个高度而已, 没有做任何处理
 
@@ -209,7 +209,7 @@ func (chain *chainImpl) processRegular(regularMessage *ab.KafkaMessageRegular, r
                 LastOriginalOffsetProcessed: newOffset,
                 LastResubmittedConfigOffset: chain.lastResubmittedConfigOffset,
             }
-		// 调用底层 consenter 支持的 WriteBlock 方法，将区块及编码后的元数据写入最佳到区块链的结构中(此时并没有写入文件的操作)
+			// 调用底层 consenter 支持的 WriteBlock 方法，将区块及编码后的元数据写入最佳到区块链的结构中(此时并没有写入文件的操作)
             chain.WriteBlock(block, metadata)
             ...
         }
@@ -241,4 +241,10 @@ func (cs *ChainSupport) Append(block *cb.Block) error {
 	return cs.ledgerResources.ReadWriter.Append(block)
 }
 ```
+
+所以fabric底层并没有什么共识和消息顺序处理, 它就是使用了Kafka自带的共识和消息顺序机制, 然后底层单独为kafka处理起了一个叫做kafka共识的名称
+
+# kafka共识源码解析
+
+截止到2024.6月, kafka最新版本已经是3.7.0, 已经去除了zk, 使用自带的kafka raft。
 
