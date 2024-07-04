@@ -41,3 +41,4 @@ $env:GOPRIVATE = "git.mycompany.com,github.com/my/private"
 GOPROXY=https://goproxy.cn,direct
 ```
 
+![image-20240704221802764](../../picture/image-20240704221802764.png)
