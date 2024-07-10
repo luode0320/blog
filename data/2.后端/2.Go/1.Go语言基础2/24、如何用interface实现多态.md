@@ -1,118 +1,117 @@
----
-weight: 309
-title: "如何用 interface 实现多态"
-slug: /polymorphism
----
+# 简介
 
-`Go` 语言并没有设计诸如虚函数、纯虚函数、继承、多重继承等概念，但它通过接口却非常优雅地支持了面向对象的特性。
+在 Go 语言中，多态是通过接口（interface）来实现的。
 
-多态是一种运行期的行为，它有以下几个特点：
+- 接口定义了一组方法的签名，任何实现了这些方法的类型都自动满足了该接口，从而可以在使用接口的地方互换地使用这些类型。
+- 这种特性允许我们编写能够处理不同类型的通用代码，这就是多态。
 
-> 1. 一种类型具有多种类型的能力
->2. 允许不同的对象对同一消息做出灵活的反应
->3. 以一种通用的方式对待个使用的对象
->4. 非动态语言必须通过继承和接口的方式来实现
 
-看一个实现了多态的代码例子：
 
-```golang
+# 接口定义
+
+接口由方法签名的集合组成，没有具体的实现。例如，一个简单的动物叫声接口可以这样定义：
+
+```go
+// 一个简单的动物叫声接口
+type Animal interface {
+    Speak() string
+}
+```
+
+
+
+# 实现接口
+
+任何类型只要实现了接口中声明的所有方法，就认为实现了这个接口。
+
+例如，我们可以定义 `Dog` 和 `Cat` 类型，并让它们实现 `Animal` 接口：
+
+```go
+type Dog struct{}
+
+// Speak 方法返回狗的叫声 "Woof!"
+func (d Dog) Speak() string {
+    return "Woof!"
+}
+```
+
+```go
+type Cat struct{}
+
+// Speak 方法返回猫的叫声 "Meow!"
+func (c Cat) Speak() string {
+    return "Meow!"
+}
+```
+
+
+
+# 使用接口
+
+接口可以作为函数参数、方法接收者或结构体字段的类型。
+
+例如，我们可以定义一个函数 `makeSound`，它接受一个 `Animal` 类型的参数：
+
+```go
+func makeSound(a Animal) {
+    fmt.Println(a.Speak())
+}
+```
+
+
+
+# 示例
+
+```go
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
+
+// 定义 Animal 接口
+type Animal interface {
+	Speak() string
+}
+
+// 定义 Dog 结构体
+type Dog struct{}
+
+// 实现 Animal 接口中的 Speak 方法
+func (d Dog) Speak() string {
+	return "Woof!"
+}
+
+// 定义 Cat 结构体
+type Cat struct{}
+
+// 实现 Animal 接口中的 Speak 方法
+func (c Cat) Speak() string {
+	return "Meow!"
+}
+
+// 定义 makeSound 函数，接受 Animal 接口类型的参数
+func makeSound(a Animal) {
+	fmt.Println(a.Speak())
+}
 
 func main() {
-    qcrao := Student{age: 18}
-    whatJob(&qcrao)
+	// 创建 Dog 和 Cat 的实例
+	dog := Dog{}
+	cat := Cat{}
 
-    growUp(&qcrao)
-    fmt.Println(qcrao)
-
-    stefno := Programmer{age: 100}
-    whatJob(stefno)
-
-    growUp(stefno)
-    fmt.Println(stefno)
-}
-
-func whatJob(p Person) {
-    p.job()
-}
-
-func growUp(p Person) {
-    p.growUp()
-}
-
-type Person interface {
-    job()
-    growUp()
-}
-
-type Student struct {
-    age int
-}
-
-func (p Student) job() {
-    fmt.Println("I am a student.")
-    return
-}
-
-func (p *Student) growUp() {
-    p.age += 1
-    return
-}
-
-type Programmer struct {
-    age int
-}
-
-func (p Programmer) job() {
-    fmt.Println("I am a programmer.")
-    return
-}
-
-func (p Programmer) growUp() {
-    // 程序员老得太快 ^_^
-    p.age += 10
-    return
+	// 传递 Dog 和 Cat 实例到 makeSound 函数中
+	makeSound(dog) // 输出: Woof!
+	makeSound(cat) // 输出: Meow!
 }
 ```
 
-代码里先定义了 1 个 `Person` 接口，包含两个函数：
+在这个示例中
 
-```golang
-job()
-growUp()
-```
+- `makeSound` 函数可以接受任何实现了 `Animal` 接口的类型，这意味着它能处理任何能发出声音的动物，无论具体类型。
+- 这就是多态在 Go 语言中的体现。
 
-然后，又定义了 2 个结构体，`Student` 和 `Programmer`，同时，类型 `*Student`、`Programmer` 实现了 `Person`
-接口定义的两个函数。注意，`*Student` 类型实现了接口， `Student` 类型却没有。
+接口和多态是 Go 语言中非常强大的特性，它们使得代码更加灵活、可重用和可扩展。
 
-之后，我又定义了函数参数是 `Person` 接口的两个函数：
+通过定义接口和实现接口，我们能够编写出更加健壮和可维护的代码。
 
-```golang
-func whatJob(p Person)
-func growUp(p Person)
-```
-
-`main` 函数里先生成 `Student` 和 `Programmer` 的对象，再将它们分别传入到函数 `whatJob` 和 `growUp`
-。函数中，直接调用接口函数，实际执行的时候是看最终传入的实体类型是什么，调用的是实体类型实现的函数。于是，不同对象针对同一消息就有多种表现，`多态`
-就实现了。
-
-更深入一点来说的话，在函数 `whatJob()` 或者 `growUp()` 内部，接口 `person` 绑定了实体类型 `*Student` 或者 `Programmer`
-。根据前面分析的 `iface` 源码，这里会直接调用 `fun` 里保存的函数，类似于： `s.tab->fun[0]`，而因为 `fun`
-数组里保存的是实体类型实现的函数，所以当函数传入不同的实体类型时，调用的实际上是不同的函数实现，从而实现多态。
-
-运行一下代码：
-
-```shell
-I am a student.
-{19}
-I am a programmer.
-{100}
-```
-
-# 参考资料
-
-【各种面向对象的名词】https://cyent.github.io/golang/other/oo/
-
-【多态与鸭子类型】https://www.jb51.net/article/116025.htm
