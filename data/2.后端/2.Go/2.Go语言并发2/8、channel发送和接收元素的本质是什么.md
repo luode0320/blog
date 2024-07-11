@@ -8,8 +8,6 @@
 - 或者是直接从 sender goroutine 到 receiver goroutine。
 - 这一过程确保了数据的一致性和线程安全，因为 channel 作为通信的中介，控制了数据的流动。
 
-
-
 # 拷贝本质
 
 `runtime/stubs.go`
@@ -24,8 +22,6 @@
 //go:noescape
 func memmove(to, from unsafe.Pointer, n uintptr)
 ```
-
-
 
 通过 channel 发送和接收元素的过程本质上是数据的值拷贝和同步控制，确保了在多 goroutine 环境下的数据完整性和线程安全。
 

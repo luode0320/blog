@@ -6,11 +6,12 @@
 
 以下是一些可能导致资源泄漏的常见情况：
 
-1. **未关闭的 channel**：如果一个 channel 被创建但从未被关闭，而有 goroutine 正在等待从这个 channel 接收数据，那么这些 goroutines 可能会永远阻塞，导致 goroutine 泄漏。
-2. **未处理的 channel 关闭**：如果一个 goroutine 正在从一个已经关闭的 channel 接收数据，但没有适当地检查 `ok` 值来判断 channel 是否关闭，后续不停接收, 那么该 goroutine 可能会无限期地阻塞。
-3. **未读取的 channel 数据**：如果数据被发送到一个 channel，但没有相应的 goroutine 从 channel 接收这些数据，尤其是在有缓冲的 channel 中，可能会导致 channel 的缓冲区填满，进而导致发送方 goroutine 阻塞，甚至可能引起整个程序的死锁。
-
-
+1. **未关闭的 channel**：如果一个 channel 被创建但从未被关闭，而有 goroutine 正在等待从这个 channel 接收数据，那么这些
+   goroutines 可能会永远阻塞，导致 goroutine 泄漏。
+2. **未处理的 channel 关闭**：如果一个 goroutine 正在从一个已经关闭的 channel 接收数据，但没有适当地检查 `ok` 值来判断
+   channel 是否关闭，后续不停接收, 那么该 goroutine 可能会无限期地阻塞。
+3. **未读取的 channel 数据**：如果数据被发送到一个 channel，但没有相应的 goroutine 从 channel 接收这些数据，尤其是在有缓冲的
+   channel 中，可能会导致 channel 的缓冲区填满，进而导致发送方 goroutine 阻塞，甚至可能引起整个程序的死锁。
 
 # 示例
 
@@ -47,7 +48,8 @@ func main() {
 }
 ```
 
-在这个示例中，`sendData` goroutine 将无限期地向 channel 发送数据，但由于没有从 channel 接收数据或关闭 channel 的机制，`sendData` goroutine 将永久阻塞在发送操作上，从而导致 goroutine 泄漏。
+在这个示例中，`sendData` goroutine 将无限期地向 channel 发送数据，但由于没有从 channel 接收数据或关闭 channel
+的机制，`sendData` goroutine 将永久阻塞在发送操作上，从而导致 goroutine 泄漏。
 
 为了避免这种情况，你需要确保：
 

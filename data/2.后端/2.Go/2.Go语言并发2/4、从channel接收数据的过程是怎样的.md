@@ -2,25 +2,27 @@
 
 在 Go 语言中，从 channel 接收数据的过程主要包括以下几个步骤：
 
-1. **选择 channel**：首先确定要从哪个 channel 接收数据。这个 channel 必须已经创建并且至少包含了一些数据，或者有另一个 goroutine 正在向 channel 发送数据。
+1. **选择 channel**：首先确定要从哪个 channel 接收数据。这个 channel 必须已经创建并且至少包含了一些数据，或者有另一个
+   goroutine 正在向 channel 发送数据。
 
-2. **接收操作**：使用 channel 的接收语法 `<-` 来接收数据。语法形式为 `value := <-ch`，其中 `ch` 是 channel 的变量名，`value` 是接收的数据。
+2. **接收操作**：使用 channel 的接收语法 `<-` 来接收数据。语法形式为 `value := <-ch`，其中 `ch` 是 channel 的变量名，`value`
+   是接收的数据。
 
    如果 channel 是无缓冲的，接收操作会阻塞，直到有另一个 goroutine 向该 channel 发送数据。
 
    如果 channel 是有缓冲的，接收操作会从缓冲区中移除并返回一个数据，如果缓冲区为空，则接收也会阻塞，直到有发送操作。
 
-3. **阻塞与唤醒**：如果接收操作遇到阻塞，Go 的运行时会挂起当前的 goroutine，直到有相应的发送操作发生。一旦数据被接收，接收 goroutine 将被唤醒并继续执行。
+3. **阻塞与唤醒**：如果接收操作遇到阻塞，Go 的运行时会挂起当前的 goroutine，直到有相应的发送操作发生。一旦数据被接收，接收
+   goroutine 将被唤醒并继续执行。
 
 4. **检查 channel 是否关闭**：如果 channel 已经关闭并且缓冲区中没有剩余的数据，接收操作将返回 channel 类型的零值，而不是阻塞。
 
-   对于基本类型，零值通常是 `0`（对于整数）或 `false`（对于布尔值）。如果 channel 是切片、map 或者 channel 类型自身，那么零值就是 `nil`。
+   对于基本类型，零值通常是 `0`（对于整数）或 `false`（对于布尔值）。如果 channel 是切片、map 或者 channel
+   类型自身，那么零值就是 `nil`。
 
 5. **使用 `range` 循环接收**：你也可以使用 `for-range` 循环从 channel 接收数据，直到 channel 关闭并且没有更多的数据。
 
    如果 channel 被关闭，`range` 循环会终止。
-
-
 
 # chanrecv源码
 
@@ -32,8 +34,6 @@
 - 一种不带  "ok"，这种写法
 
 当接收到相应类型的零值时无法知道是真实的发送者发送过来的值，还是 channel 被关闭后，返回给接收者的默认类型的零值。
-
-
 
 ```golang
 // 处理不带 "ok" 的情形
@@ -225,7 +225,8 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 }
 ```
 
-1. **初始化检查**：首先检查通道是否为 `nil`，如果是并且 `block` 为 `false`，则直接返回。如果通道为 `nil` 并且 `block` 为 `true`，则挂起当前 goroutine。
+1. **初始化检查**：首先检查通道是否为 `nil`，如果是并且 `block` 为 `false`，则直接返回。如果通道为 `nil` 并且 `block`
+   为 `true`，则挂起当前 goroutine。
 
 2. **快速路径检查**：如果 `block` 为 `false` 且通道为空，则返回 `(false, false)`。如果通道关闭但队列中还有数据，则准备接收数据。
 
@@ -257,16 +258,10 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 
 15. **释放 sudog**：使用 `releaseSudog()` 函数释放 sudog，因为等待已经结束。
 
-
-
-
-
 下面将详细解析下部分过程中的代码:
 
 - `recv`: 接收
 - `recvDirect`: 发送的goroutine数据写入接受的goroutine
-
-
 
 ## recv接收源码
 
@@ -350,22 +345,20 @@ func recv(c *hchan, sg *sudog, ep unsafe.Pointer, unlockf func(), skip int) {
 
 2. **有缓冲通道处理**：
 
-   - 从缓冲区取数据到接收者, 并将发送者的数据交换到这个被取出的缓存位置保存
-   - 从队列复制数据到接收者。
-   - 从发送者复制数据到队列。
-   - 更新接收和发送位置，以维护循环缓冲区的行为。
+    - 从缓冲区取数据到接收者, 并将发送者的数据交换到这个被取出的缓存位置保存
+    - 从队列复制数据到接收者。
+    - 从发送者复制数据到队列。
+    - 更新接收和发送位置，以维护循环缓冲区的行为。
 
 3. **清理发送者数据**：清除发送者 sudog 的 `elem` 字段，避免数据残留。
 
 4. **唤醒发送者 goroutine**：
 
-   - 解锁通道。
-   - 设置发送者 goroutine 的参数。
-   - 标记发送成功。
-   - 更新发送者 sudog 的释放时间。
-   - 将发送者 goroutine 设置为可运行状态。
-
-   
+    - 解锁通道。
+    - 设置发送者 goroutine 的参数。
+    - 标记发送成功。
+    - 更新发送者 sudog 的释放时间。
+    - 将发送者 goroutine 设置为可运行状态。
 
 如果是非缓冲型的，就直接从发送者的栈拷贝到接收者的栈。
 
@@ -386,8 +379,6 @@ func recvDirect(t *_type, sg *sudog, dst unsafe.Pointer) {
 ```
 
 否则就从缓冲区将数据拷贝到接收者。
-
-
 
 # 案例分析
 

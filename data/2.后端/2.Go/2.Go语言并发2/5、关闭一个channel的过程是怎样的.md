@@ -2,7 +2,8 @@
 
 在 Go 语言中，关闭一个 channel 主要涉及到以下步骤：
 
-1. **确认发送方已经完成发送**：通常在所有的发送操作完成之后，发送方的 goroutine 会负责关闭 channel。这是因为一旦 channel 被关闭，就无法再向其发送数据。
+1. **确认发送方已经完成发送**：通常在所有的发送操作完成之后，发送方的 goroutine 会负责关闭 channel。这是因为一旦 channel
+   被关闭，就无法再向其发送数据。
 
 2. **使用 `close()` 函数**：发送方的 goroutine 使用内置的 `close()` 函数来关闭 channel。这将标记 channel 为已关闭状态。
 
@@ -11,8 +12,6 @@
    如果 channel 缓冲区为空，接收操作将立即返回零值和一个 `false` 的第二返回值（如果使用了 `recv, ok := <-ch` 的形式）。
 
 4. **垃圾回收**：如果没有任何 goroutine 引用该 channel，即使没有被显式关闭，它也会被垃圾回收器回收。
-
-
 
 # closechan源码
 
@@ -126,14 +125,12 @@ func closechan(c *hchan) {
 1. **检查通道**：首先检查通道是否为 `nil` 或者已经关闭，如果是，则触发 panic。
 2. **加锁通道**：加锁通道，防止其他 goroutines 在关闭过程中修改通道状态。
 3. **标记通道关闭**：将通道的 `closed` 标志设为 `1`，表示通道已关闭。
-4. **释放所有等待接收的 goroutines**：遍历接收队列，清除每个 sudog 的数据，将 sudog 的 `success` 字段设为 `false`，并将 goroutine 添加到 `glist` 列表中。
-5. **释放所有等待发送的 goroutines**：遍历发送队列，将 sudog 的 `elem` 字段清空，将 sudog 的 `success` 字段设为 `false`，并将 goroutine 添加到 `glist` 列表中。
+4. **释放所有等待接收的 goroutines**：遍历接收队列，清除每个 sudog 的数据，将 sudog 的 `success` 字段设为 `false`，并将
+   goroutine 添加到 `glist` 列表中。
+5. **释放所有等待发送的 goroutines**：遍历发送队列，将 sudog 的 `elem` 字段清空，将 sudog 的 `success` 字段设为 `false`，并将
+   goroutine 添加到 `glist` 列表中。
 6. **解锁通道**：完成所有内部操作后，解锁通道。
 7. **唤醒所有等待的 goroutines**：遍历 `glist` 列表，将所有等待的 goroutines 设置为可运行状态，使它们可以继续执行。
-
-
-
-
 
 # 示例
 

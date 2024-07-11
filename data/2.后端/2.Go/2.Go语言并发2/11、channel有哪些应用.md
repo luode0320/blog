@@ -6,8 +6,6 @@ Go 语言中的 channel 是一种强大的并发工具，它用于在 goroutines
 
 接下来，我们就要梳理一下 channel 的应用。
 
-
-
 # 生产者-消费者
 
 Channels 可以用作数据流的管道，允许你将一系列任务分解为独立的阶段，每个阶段由一个或多个 goroutines 处理。
@@ -51,11 +49,10 @@ func main() {
 
 - `producer` 函数负责生产数据并将数据发送到通道 `ch` 中，最后关闭通道。
 - `consumer` 函数从通道 `ch` 中接收数据，并将接收到的数据打印出来。
-- `main` 函数首先创建了一个整数类型的无缓冲通道 `ch`，然后启动了一个生产者 goroutine 调用 `producer(ch)` 向通道发送数据，最后在主 goroutine 中调用 `consumer(ch)` 对通道中的数据进行消费和打印。
+- `main` 函数首先创建了一个整数类型的无缓冲通道 `ch`，然后启动了一个生产者 goroutine 调用 `producer(ch)` 向通道发送数据，最后在主
+  goroutine 中调用 `consumer(ch)` 对通道中的数据进行消费和打印。
 
 整个程序实现了一个简单的生产者-消费者模型，生产者不断向通道发送数据，消费者从通道接收数据并处理。
-
-
 
 # 控制并发
 
@@ -103,11 +100,10 @@ func main() {
 在这个程序中：
 
 - `fetch` 函数用于从给定的 URL 获取数据，在获取数据之前会使用信号量 `sem` 控制并发请求的数量，以此限制同时进行的最大并发请求数量。
-- `main` 函数初始化了一个包含多个 URL 的数组 `urls`，创建了一个 `WaitGroup` 用于等待所有 goroutine 完成，以及一个有缓冲的信号量通道 `sem`，限制最多同时进行的并发请求数量为 2。
+- `main` 函数初始化了一个包含多个 URL 的数组 `urls`，创建了一个 `WaitGroup` 用于等待所有 goroutine
+  完成，以及一个有缓冲的信号量通道 `sem`，限制最多同时进行的并发请求数量为 2。
 - 在 `main` 函数中，通过循环为每个 URL 启动一个 goroutine，并在 goroutine 中调用 `fetch` 函数以获取数据。
 - 每个 URL 对应一个 goroutine，通过 `WaitGroup` 等待所有 goroutine 完成。
-
-
 
 # 状态和控制信号
 
@@ -156,12 +152,12 @@ func main() {
 
 在这个程序中, 一个通道处理完成之后, 再唤醒交由下一个通道执行：
 
-- `worker` 函数表示一个工作 goroutine，每个工作 goroutine 通过 jobs 通道接收工作，处理工作，然后将处理结果通过 results 通道发送出去。
-- `main` 函数中，先创建了带有缓冲区大小为100的jobs和results通道，然后启动了3个工作者 goroutine，它们从 jobs 通道中读取工作并返回处理结果到 results 通道。
+- `worker` 函数表示一个工作 goroutine，每个工作 goroutine 通过 jobs 通道接收工作，处理工作，然后将处理结果通过 results
+  通道发送出去。
+- `main` 函数中，先创建了带有缓冲区大小为100的jobs和results通道，然后启动了3个工作者 goroutine，它们从 jobs 通道中读取工作并返回处理结果到
+  results 通道。
 - 之后，向jobs通道发送了5个工作，然后关闭了jobs通道，表示所有工作已提交。
 - 最后，从结果通道中接收并打印了5个结果。
-
-
 
 # 定时器和超时
 

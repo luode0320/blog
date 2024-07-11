@@ -4,10 +4,9 @@
 
 1. **确保 channel 仅由一个 goroutine 关闭**：避免多个 goroutine 尝试关闭同一个 channel，因为这可能会导致 panic。
 2. **在发送方完成发送后关闭 channel**：确保所有数据都已经发送到 channel 后再关闭它，避免关闭一个仍在使用的 channel。
-3. **使用 select 或检查 `ok` 值来检测 channel 是否已关闭**：当从 channel 接收数据时，使用 `select` 语句或检查 `recv, ok := <-ch` 的 `ok` 值来判断 channel 是否关闭。
+3. **使用 select 或检查 `ok` 值来检测 channel 是否已关闭**：当从 channel 接收数据时，使用 `select`
+   语句或检查 `recv, ok := <-ch` 的 `ok` 值来判断 channel 是否关闭。
 4. **不要在接收端关闭 channel**：关闭 channel 应当由发送数据的 goroutine 完成。
-
-
 
 # 示例
 
@@ -73,6 +72,7 @@ func main() {
 - 我们使用 `sync.WaitGroup` 来确保 `sendData` goroutine 完成了它的任务。
 - `sendData` 函数在一个 goroutine 中向 channel 发送数字，然后关闭 channel。
 - 主 goroutine 使用 `select` 语句来尝试接收数据，如果 channel 中没有数据或已经关闭，则不会阻塞。
-- 使用 `for` 循环和 `val, ok := <-ch` 形式从 channel 接收数据。一旦 `ok` 是 `false`，表示 channel 已经关闭并且没有更多的数据可以读取，此时退出循环。
+- 使用 `for` 循环和 `val, ok := <-ch` 形式从 channel 接收数据。一旦 `ok` 是 `false`，表示 channel
+  已经关闭并且没有更多的数据可以读取，此时退出循环。
 
 这种模式确保了 goroutines 之间的同步，并且优雅地处理了 channel 的关闭，避免了死锁和数据竞争的情况。

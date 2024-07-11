@@ -4,9 +4,11 @@
 
 1. **选择 channel**：首先确定要向哪个 channel 发送数据。channel 必须已经创建，可以通过 `make` 函数来创建
 
-   例如 `ch := make(chan int)` 创建一个无缓冲的整型 channel，或者 `ch := make(chan int, 10)` 创建一个缓冲大小为 10 的整型 channel。
+   例如 `ch := make(chan int)` 创建一个无缓冲的整型 channel，或者 `ch := make(chan int, 10)` 创建一个缓冲大小为 10 的整型
+   channel。
 
-2. **发送操作**：使用 channel 的发送语法 `<-` 来发送数据。语法形式为 `ch <-value`，其中 `ch` 是 channel 的变量名，`value` 是要发送的值。
+2. **发送操作**：使用 channel 的发送语法 `<-` 来发送数据。语法形式为 `ch <-value`，其中 `ch` 是 channel 的变量名，`value`
+   是要发送的值。
 
    如果 channel 是无缓冲的，发送操作会阻塞，直到有另一个 goroutine 准备好从该 channel 接收数据。
 
@@ -19,8 +21,6 @@
 4. **关闭 channel**：在所有数据发送完毕后，可以使用 `close(ch)` 函数来关闭 channel，这会通知所有接收方不再有更多数据。
 
    关闭 channel 后，再向 channel 发送数据会导致 panic。
-
-
 
 # chansend源码
 
@@ -196,7 +196,8 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 }
 ```
 
-1. **检查通道**：首先检查通道 `c` 是否为 `nil`，如果是，并且是非阻塞模式，那么直接返回 `false`。如果是阻塞模式，调用 `gopark` 进行阻塞。
+1. **检查通道**：首先检查通道 `c` 是否为 `nil`，如果是，并且是非阻塞模式，那么直接返回 `false`。如果是阻塞模式，调用 `gopark`
+   进行阻塞。
 
 2. **竞争检测**：如果启用了竞争检测，记录当前函数调用的位置。
 
@@ -234,14 +235,10 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 18. **检查通道状态**：如果通道在等待期间被关闭，触发 panic。
 
-
-
 下面将详细解析下部分过程中的代码:
 
 - `send`: 发送
 - `sendDirect`: 发送的goroutine数据写入接受的goroutine
-
-
 
 ## send发送源码
 
@@ -327,8 +324,6 @@ func send(c *hchan, sg *sudog, ep unsafe.Pointer, unlockf func(), skip int) {
 7. **更新释放时间**：如果 sudog 的 `releasetime` 不为零，更新为当前时间戳。
 8. **唤醒接收者**: 唤醒的goroutine, 处理接收的数据
 
-
-
 ## sendDirect两个goroutine传递数据
 
 继续看 `sendDirect` 函数：
@@ -363,8 +358,6 @@ func sendDirect(t *_type, sg *sudog, src unsafe.Pointer) {
 - 而这也违反了 GC 的一些假设。
 - 为了不出问题，写的过程中增加了写屏障，保证正确地完成写操作。
 - 这样做的好处是减少了一次内存 copy：不用先拷贝到 channel 的 buf，直接由发送者到接收者，没有中间商赚差价，效率得以提高，完美。
-
-
 
 # 案例分析
 
@@ -444,7 +437,8 @@ func send(c *hchan, sg *sudog, ep unsafe.Pointer, unlockf func(), skip int) {
 
 - 这里其实涉及到一个协程写另一个协程栈的操作。
 - 有两个 receiver (G1 和 G2)在 channel 的一边虎视眈眈地等着
-- 这时 channel 另一边来了一个 sender 准备向 channel 发送数据，为了高效，用不着通过 channel 的 buf “中转”一次，直接从源地址把数据 copy 到目的地址
+- 这时 channel 另一边来了一个 sender 准备向 channel 发送数据，为了高效，用不着通过 channel 的 buf “中转”一次，直接从源地址把数据
+  copy 到目的地址
 
 ![image-20240615180654613](../../../picture/image-20240615180654613.png)
 
