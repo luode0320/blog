@@ -1,72 +1,102 @@
----
-weight: 404
-title: "从 channel 接收数据的过程是怎样的"
-slug: /recv
----
+# 简介
 
-# 源码分析
+在 Go 语言中，从 channel 接收数据的过程主要包括以下几个步骤：
 
-我们先来看一下接收相关的源码。在清楚了接收的具体过程之后，再根据一个实际的例子来具体研究。
+1. **选择 channel**：首先确定要从哪个 channel 接收数据。这个 channel 必须已经创建并且至少包含了一些数据，或者有另一个 goroutine 正在向 channel 发送数据。
 
-接收操作有两种写法，一种带 "ok"，反应 channel 是否关闭；一种不带  "ok"，这种写法，当接收到相应类型的零值时无法知道是真实的发送者发送过来的值，还是
-channel 被关闭后，返回给接收者的默认类型的零值。两种写法，都有各自的应用场景。
+2. **接收操作**：使用 channel 的接收语法 `<-` 来接收数据。语法形式为 `value := <-ch`，其中 `ch` 是 channel 的变量名，`value` 是接收的数据。
 
-经过编译器的处理后，这两种写法最后对应源码里的这两个函数：
+   如果 channel 是无缓冲的，接收操作会阻塞，直到有另一个 goroutine 向该 channel 发送数据。
+
+   如果 channel 是有缓冲的，接收操作会从缓冲区中移除并返回一个数据，如果缓冲区为空，则接收也会阻塞，直到有发送操作。
+
+3. **阻塞与唤醒**：如果接收操作遇到阻塞，Go 的运行时会挂起当前的 goroutine，直到有相应的发送操作发生。一旦数据被接收，接收 goroutine 将被唤醒并继续执行。
+
+4. **检查 channel 是否关闭**：如果 channel 已经关闭并且缓冲区中没有剩余的数据，接收操作将返回 channel 类型的零值，而不是阻塞。
+
+   对于基本类型，零值通常是 `0`（对于整数）或 `false`（对于布尔值）。如果 channel 是切片、map 或者 channel 类型自身，那么零值就是 `nil`。
+
+5. **使用 `range` 循环接收**：你也可以使用 `for-range` 循环从 channel 接收数据，直到 channel 关闭并且没有更多的数据。
+
+   如果 channel 被关闭，`range` 循环会终止。
+
+
+
+# chanrecv源码
+
+`runtime/chan.go`
+
+接收操作有两种写法
+
+- 一种带 "ok"，反应 channel 是否关闭
+- 一种不带  "ok"，这种写法
+
+当接收到相应类型的零值时无法知道是真实的发送者发送过来的值，还是 channel 被关闭后，返回给接收者的默认类型的零值。
+
+
 
 ```golang
-// entry points for <- c from compiled code
+// 处理不带 "ok" 的情形
 func chanrecv1(c *hchan, elem unsafe.Pointer) {
 	chanrecv(c, elem, true)
 }
-
+// 返回 "received" 这个字段来反应 channel 是否被关闭
 func chanrecv2(c *hchan, elem unsafe.Pointer) (received bool) {
 	_, received = chanrecv(c, elem, true)
 	return
 }
+// 如果使用的是 select, 则使用非阻塞的模式
+func selectnbrecv(elem unsafe.Pointer, c *hchan) (selected, received bool) {
+	return chanrecv(c, elem, false)
+}
 ```
-
-`chanrecv1` 函数处理不带 "ok" 的情形，`chanrecv2` 则通过返回 "received" 这个字段来反应 channel
-是否被关闭。接收值则比较特殊，会“放到”参数 `elem` 所指向的地址了，这很像 C/C++ 里的写法。如果代码里忽略了接收值，这里的 elem
-为 nil。
 
 无论如何，最终转向了 `chanrecv` 函数：
 
 ```golang
-// 位于 src/runtime/chan.go
-
-// chanrecv 函数接收 channel c 的元素并将其写入 ep 所指向的内存地址。
-// 如果 ep 是 nil，说明忽略了接收值。
-// 如果 block == false，即非阻塞型接收，在没有数据可接收的情况下，返回 (false, false)
-// 否则，如果 c 处于关闭状态，将 ep 指向的地址清零，返回 (true, false)
-// 否则，用返回值填充 ep 指向的内存地址。返回 (true, true)
-// 如果 ep 非空，则应该指向堆或者函数调用者的栈
-
+// 在通道 c 上接收数据，并将接收到的数据写入 ep。
+// ep 可以为 nil，在这种情况下，接收到的数据会被忽略。
+// 如果 block 为 false 且没有元素可用，则返回 (false, false)。
+// 否则，如果 c 已关闭，则将 *ep 置零并返回 (true, false)。
+// 否则，填充 *ep 并返回 (true, true)。
+// 非 nil 的 ep 必须指向堆或调用者的堆栈。
 func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool) {
-	// 省略 debug 内容 …………
+	// raceenabled: 不需要检查 ep，因为它总是位于堆栈上
+	// 或是由 reflect 分配的新内存。
 
-	// 如果是一个 nil 的 channel
+	if debugChan {
+		print("chanrecv: chan=", c, "\n")
+	}
+
 	if c == nil {
-		// 如果不阻塞，直接返回 (false, false)
 		if !block {
 			return
 		}
-		// 否则，接收一个 nil 的 channel，goroutine 挂起
-		gopark(nil, nil, "chan receive (nil chan)", traceEvGoStop, 2)
-		// 不会执行到这里
+		gopark(nil, nil, waitReasonChanReceiveNilChan, traceBlockForever, 2)
 		throw("unreachable")
 	}
 
-	// 在非阻塞模式下，快速检测到失败，不用获取锁，快速返回
-	// 当我们观察到 channel 没准备好接收：
-	// 1. 非缓冲型，等待发送列队 sendq 里没有 goroutine 在等待
-	// 2. 缓冲型，但 buf 里没有元素
-	// 之后，又观察到 closed == 0，即 channel 未关闭。
-	// 因为 channel 不可能被重复打开，所以前一个观测的时候 channel 也是未关闭的，
-	// 因此在这种情况下可以直接宣布接收失败，返回 (false, false)
-	if !block && (c.dataqsiz == 0 && c.sendq.first == nil ||
-		c.dataqsiz > 0 && atomic.Loaduint(&c.qcount) == 0) &&
-		atomic.Load(&c.closed) == 0 {
-		return
+	// 快速路径：在不获取锁的情况下，检查失败的非阻塞操作。
+	if !block && empty(c) {
+		// 观察到通道不适合接收后，检查通道是否关闭。
+		// 重新排序这些检查可能导致与关闭竞赛时的不正确行为。
+		if atomic.Load(&c.closed) == 0 {
+			// 因为通道不能重新打开，所以后来观察到通道没有关闭意味着它在第一次观察时也没有关闭。
+			// 我们的行为就像我们在那一刻观察到的通道，并报告接收无法进行。
+			return
+		}
+		// 通道不可逆地关闭。重新检查通道是否接收任何待接收数据，
+		// 这些数据可能出现在空和关闭检查之间的时刻。
+		if empty(c) {
+			// 通道不可逆地关闭且为空。
+			if raceenabled {
+				raceacquire(c.raceaddr())
+			}
+			if ep != nil {
+				typedmemclr(c.elemtype, ep)
+			}
+			return true, false
+		}
 	}
 
 	var t0 int64
@@ -74,249 +104,312 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 		t0 = cputicks()
 	}
 
-	// 加锁
 	lock(&c.lock)
 
-	// channel 已关闭，并且循环数组 buf 里没有元素
-	// 这里可以处理非缓冲型关闭 和 缓冲型关闭但 buf 无元素的情况
-	// 也就是说即使是关闭状态，但在缓冲型的 channel，
-	// buf 里有元素的情况下还能接收到元素
-	if c.closed != 0 && c.qcount == 0 {
-		if raceenabled {
-			raceacquire(unsafe.Pointer(c))
+	if c.closed != 0 {
+		if c.qcount == 0 {
+			if raceenabled {
+				raceacquire(c.raceaddr())
+			}
+			unlock(&c.lock)
+			if ep != nil {
+				typedmemclr(c.elemtype, ep)
+			}
+			return true, false
 		}
-		// 解锁
-		unlock(&c.lock)
-		if ep != nil {
-			// 从一个已关闭的 channel 执行接收操作，且未忽略返回值
-			// 那么接收的值将是一个该类型的零值
-			// typedmemclr 根据类型清理相应地址的内存
-			typedmemclr(c.elemtype, ep)
+		// 通道已关闭，但通道的缓冲中有数据, 不必理会, 就算关闭了, 也可以继续读取。
+	} else {
+		// 找到未关闭的等待发送者。
+		if sg := c.sendq.dequeue(); sg != nil {
+			// 找到等待的发送者。如果缓冲区大小为 0，直接从发送者接收值。
+			// 否则，从队列头部接收并添加发送者的值到队列尾部。
+			recv(c, sg, ep, func() { unlock(&c.lock) }, 3)
+			return true, true
 		}
-		// 从一个已关闭的 channel 接收，selected 会返回true
-		return true, false
 	}
 
-	// 等待发送队列里有 goroutine 存在，说明 buf 是满的
-	// 这有可能是：
-	// 1. 非缓冲型的 channel
-	// 2. 缓冲型的 channel，但 buf 满了
-	// 针对 1，直接进行内存拷贝（从 sender goroutine -> receiver goroutine）
-	// 针对 2，接收到循环数组头部的元素，并将发送者的元素放到循环数组尾部
-	if sg := c.sendq.dequeue(); sg != nil {
-		// Found a waiting sender. If buffer is size 0, receive value
-		// directly from sender. Otherwise, receive from head of queue
-		// and add sender's value to the tail of the queue (both map to
-		// the same buffer slot because the queue is full).
-		recv(c, sg, ep, func() { unlock(&c.lock) }, 3)
-		return true, true
-	}
-
-	// 缓冲型，buf 里有元素，可以正常接收
 	if c.qcount > 0 {
-		// 直接从循环数组里找到要接收的元素
+		// 直接从队列接收。
+		// 计算队列中数据的位置
 		qp := chanbuf(c, c.recvx)
 
-		// …………
+		// 如果启用了竞争检测
+		if raceenabled {
+			// 通知竞争检测器当前正在访问的缓冲区位置
+			racenotify(c, c.recvx, nil)
+		}
 
-		// 代码里，没有忽略要接收的值，不是 "<- ch"，而是 "val <- ch"，ep 指向 val
+		// 如果 ep 不为 nil，意味着接收端希望接收数据
 		if ep != nil {
+			// 将通道队列中的数据复制到接收端提供的位置
 			typedmemmove(c.elemtype, ep, qp)
 		}
-		// 清理掉循环数组里相应位置的值
+
+		// 清除队列中的数据，以便下次发送或接收可以使用这个位置
 		typedmemclr(c.elemtype, qp)
-		// 接收游标向前移动
-		c.recvx++
-		// 接收游标归零
+
+		c.recvx++ // 更新接收位置，准备下一次接收
+
+		// 如果接收位置到达缓冲区的末尾，重置为缓冲区的起始位置
 		if c.recvx == c.dataqsiz {
 			c.recvx = 0
 		}
-		// buf 数组里的元素个数减 1
-		c.qcount--
-		// 解锁
-		unlock(&c.lock)
-		return true, true
+
+		c.qcount--        // 减少队列中的数据计数，表示已取出一个数据
+		unlock(&c.lock)   // 释放通道的锁，因为接收操作已完成
+		return true, true // 返回 true 表示已成功从通道接收数据，且通道有数据
 	}
 
 	if !block {
-		// 非阻塞接收，解锁。selected 返回 false，因为没有接收到值
+		// 如果是非阻塞模式，没有数据立即可用，则立即返回，表示没有接收成功
 		unlock(&c.lock)
 		return false, false
 	}
 
-	// 接下来就是要被阻塞的情况了
-	// 构造一个 sudog
-	gp := getg()
-	mysg := acquireSudog()
+	// 没有可用的发送者：在通道上阻塞。
+
+	gp := getg()           // 获取当前 goroutine 的信息
+	mysg := acquireSudog() // 申请一个 sudog，用于跟踪 goroutine 的等待状态
 	mysg.releasetime = 0
+
+	// 如果正在收集阻塞时间信息，设置 releasetime 为 -1
 	if t0 != 0 {
 		mysg.releasetime = -1
 	}
 
-	// 待接收数据的地址保存下来
+	// 不允许在分配 elem 和将 mysg 添加到 gp.waiting 之间分割堆栈，
+	// 因为 copystack 可以找到它，这确保了在等待过程中堆栈状态的连续性
 	mysg.elem = ep
 	mysg.waitlink = nil
 	gp.waiting = mysg
 	mysg.g = gp
-	mysg.selectdone = nil
+	mysg.isSelect = false
 	mysg.c = c
 	gp.param = nil
-	// 进入channel 的等待接收队列
-	c.recvq.enqueue(mysg)
-	// 将当前 goroutine 挂起
-	goparkunlock(&c.lock, "chan receive", traceEvGoBlockRecv, 3)
 
-	// 被唤醒了，接着从这里继续执行一些扫尾工作
+	// 将 sudog 添加到通道的接收等待队列
+	c.recvq.enqueue(mysg)
+	
+	// 发出信号，通知任何试图缩小我们堆栈的人，我们即将在通道上挂起。
+	// 在这个 G 的状态改变和我们设置 gp.activeStackChans 之间的窗口期
+	// 不适合进行堆栈缩小，因为我们正准备挂起等待通道。
+	gp.parkingOnChan.Store(true)
+
+	// 挂起当前 goroutine，等待通道上的数据
+	gopark(chanparkcommit, unsafe.Pointer(&c.lock), waitReasonChanReceive, traceBlockChanRecv, 2)
+
+	// 有人唤醒了我们, 说明有一个发送着从队列里面读取了我们接收者阻塞的 goroutine
+	// 并将发送的数据从 发送者的 goroutine 写入到了 我们此接收者的 goroutine。
+
+	// 检查 sudog 是否仍然在等待列表中，以验证等待列表的完整性
 	if mysg != gp.waiting {
 		throw("G waiting list is corrupted")
 	}
 	gp.waiting = nil
+	gp.activeStackChans = false
+
+	// 如果设置了 releasetime，记录阻塞事件的持续时间
 	if mysg.releasetime > 0 {
 		blockevent(mysg.releasetime-t0, 2)
 	}
-	closed := gp.param == nil
+
+	// 检查 sudog 的 success 字段，以确定是否成功接收数据
+	success := mysg.success
 	gp.param = nil
 	mysg.c = nil
+
+	// 释放 sudog，因为等待已经结束
 	releaseSudog(mysg)
-	return true, !closed
+	// 返回 true 表示已经选择了通道，success 表示是否成功接收数据
+	return true, success
 }
 ```
 
-上面的代码注释地比较详细了，你可以对着源码一行行地去看，我们再来详细看一下。
+1. **初始化检查**：首先检查通道是否为 `nil`，如果是并且 `block` 为 `false`，则直接返回。如果通道为 `nil` 并且 `block` 为 `true`，则挂起当前 goroutine。
 
-- 如果 channel 是一个空值（nil），在非阻塞模式下，会直接返回。在阻塞模式下，会调用 gopark 函数挂起 goroutine，这个会一直阻塞下去。因为在
-  channel 是 nil 的情况下，要想不阻塞，只有关闭它，但关闭一个 nil 的 channel 又会发生 panic，所以没有机会被唤醒了。更详细地可以在
-  closechan 函数的时候再看。
+2. **快速路径检查**：如果 `block` 为 `false` 且通道为空，则返回 `(false, false)`。如果通道关闭但队列中还有数据，则准备接收数据。
 
--
+3. **锁定通道**：获取通道锁，开始临界区操作。
 
-和发送函数一样，接下来搞了一个在非阻塞模式下，不用获取锁，快速检测到失败并且返回的操作。顺带插一句，我们平时在写代码的时候，找到一些边界条件，快速返回，能让代码逻辑更清晰，因为接下来的正常情况就比较少，更聚焦了，看代码的人也更能专注地看核心代码逻辑了。
+4. **检查通道状态**：如果通道已关闭且队列中无数据，则将 `ep` 置零并返回 `(true, false)`。如果通道已关闭但队列中有数据，则准备接收数据。
 
-```golang
-	// 在非阻塞模式下，快速检测到失败，不用获取锁，快速返回 (false, false)
-	if !block && (c.dataqsiz == 0 && c.sendq.first == nil ||
-		c.dataqsiz > 0 && atomic.Loaduint(&c.qcount) == 0) &&
-		atomic.Load(&c.closed) == 0 {
-		return
-	}
+5. **接收数据**：如果队列中有数据，从队列中接收数据并返回 `(true, true)`。
+
+6. **检查缓冲区**：如果缓冲区有空位，读取缓冲区数据，更新计数器和索引，释放锁并返回。
+
+7. **阻塞接收**：如果没有数据并且 `block` 为 `true`，创建一个 `sudog` 实例并将当前 goroutine 挂起，等待数据到来。
+
+8. **获取 goroutine 信息**：调用 `getg()` 函数获取当前 goroutine 的信息。
+
+9. **申请 sudog**：使用 `acquireSudog()` 函数申请一个 sudog，用于跟踪 goroutine 的等待状态。
+
+10. **设置 sudog 属性**：设置 sudog 的属性，包括 `elem`、`waitlink`、`g`、`isSelect`、`c` 等字段。
+
+11. **入队列**：将 sudog 添加到通道的接收等待队列中。
+
+12. **挂起 goroutine**：使用 `gopark` 函数挂起当前 goroutine，等待通道上的数据。
+
+13. **唤醒处理**：有一个发送者从队列里面读取了我们接收者阻塞的 goroutine,goroutine 被唤醒后
+
+    并将发送的数据从 发送者的 goroutine 写入到了 我们接收者的 goroutine
+
+14. **记录阻塞时间**：如果设置了 `releasetime`，记录阻塞事件的持续时间。
+
+15. **释放 sudog**：使用 `releaseSudog()` 函数释放 sudog，因为等待已经结束。
+
+
+
+
+
+下面将详细解析下部分过程中的代码:
+
+- `recv`: 接收
+- `recvDirect`: 发送的goroutine数据写入接受的goroutine
+
+
+
+## recv接收源码
+
+在上面源码部分, 如果通道没关闭, 并且有正在阻塞的发送者, 会直接调用:
+
+```go
+// 找到未关闭的等待发送者。
+if sg := c.sendq.dequeue(); sg != nil {
+    // 找到等待的发送者。如果缓冲区大小为 0，直接从发送者接收值。
+    // 否则，从队列头部接收并添加发送者的值到队列尾部。
+    recv(c, sg, ep, func() { unlock(&c.lock) }, 3)
+    return true, true
+}
 ```
 
-当我们观察到 channel 没准备好接收：
-
-1. 非缓冲型，等待发送列队里没有 goroutine 在等待
-2. 缓冲型，但 buf 里没有元素
-
-之后，又观察到 closed == 0，即 channel 未关闭。
-
-因为 channel 不可能被重复打开，所以前一个观测的时候， channel
-也是未关闭的，因此在这种情况下可以直接宣布接收失败，快速返回。因为没被选中，也没接收到数据，所以返回值为 (false, false)。
-
-- 接下来的操作，首先会上一把锁，粒度比较大。如果 channel 已关闭，并且循环数组 buf 里没有元素。对应非缓冲型关闭和缓冲型关闭但
-  buf 无元素的情况，返回对应类型的零值，但 received 标识是 false，告诉调用者此 channel 已关闭，你取出来的值并不是正常由发送者发送过来的数据。但是如果处于
-  select 语境下，这种情况是被选中了的。很多将 channel 用作通知信号的场景就是命中了这里。
-
-- 接下来，如果有等待发送的队列，说明 channel 已经满了，要么是非缓冲型的 channel，要么是缓冲型的 channel，但 buf
-  满了。这两种情况下都可以正常接收数据。
-
-于是，调用 recv 函数：
-
 ```golang
+// 处理在满通道 c 上的接收操作。
+// 包含两个部分：
+//  1. 发送者 sg 发送的值被放入通道中，
+//     并唤醒发送者继续执行。
+//  2. 接收者（当前的 G）接收到的值被写入 ep。
+//
+// 对于同步通道，两个值相同。
+// 对于异步通道，接收者从通道缓冲区获取数据，
+// 而发送者的数据被放入通道缓冲区。
+// 通道 c 必须是满的且已锁定。recv 使用 unlockf 解锁 c。
+// sg 必须已经被从 c 中出队。
+// 非 nil 的 ep 必须指向堆或调用者的堆栈。
 func recv(c *hchan, sg *sudog, ep unsafe.Pointer, unlockf func(), skip int) {
 	// 如果是非缓冲型的 channel
 	if c.dataqsiz == 0 {
+		// 无缓冲通道的处理
 		if raceenabled {
-			racesync(c, sg)
+			racesync(c, sg) // 竞争检测同步
 		}
-		// 未忽略接收的数据
 		if ep != nil {
-			// 直接拷贝数据，从 sender goroutine -> receiver goroutine
+			// 从发送者复制数据
 			recvDirect(c.elemtype, sg, ep)
 		}
 	} else {
 		// 缓冲型的 channel，但 buf 已满。
-		// 将循环数组 buf 队首的元素拷贝到接收数据的地址
-		// 将发送者的数据入队。实际上这时 recvx 和 sendx 值相等
-		// 找到接收游标
+		// 将循环数组 buf 队首的元素拷贝到接收数据的地址, 将发送者的数据入队。
+		// 实际就是如果缓冲区满, 接收者取出数据, 并把新的发送者的数据填充进去
+
+		// 找到接收者的游标位置
 		qp := chanbuf(c, c.recvx)
-		// …………
+		if raceenabled {
+			racenotify(c, c.recvx, nil) // 竞争检测通知
+			racenotify(c, c.recvx, sg)
+		}
+
 		// 将接收游标处的数据拷贝给接收者
 		if ep != nil {
 			typedmemmove(c.elemtype, ep, qp)
 		}
-
 		// 将发送者数据拷贝到 buf
 		typedmemmove(c.elemtype, qp, sg.elem)
-		// 更新游标值
 		c.recvx++
 		if c.recvx == c.dataqsiz {
-			c.recvx = 0
+			c.recvx = 0 // 循环缓冲区
 		}
-		c.sendx = c.recvx
+		// 更新发送位置
+		c.sendx = c.recvx // c.sendx = (c.sendx+1) % c.dataqsiz
 	}
-	sg.elem = nil
-	gp := sg.g
+	sg.elem = nil                 // 清除发送者数据
+	gp := sg.g                    // 获取发送者 goroutine
+	unlockf()                     // 解锁通道
+	gp.param = unsafe.Pointer(sg) // 设置 goroutine 参数
+	sg.success = true             // 标记为成功
 
-	// 解锁
-	unlockf()
-	gp.param = unsafe.Pointer(sg)
+	// 更新释放时间
 	if sg.releasetime != 0 {
 		sg.releasetime = cputicks()
 	}
-
-	// 唤醒发送的 goroutine。需要等到调度器的光临
+	// 将发送者 goroutine 设置为可运行状态
 	goready(gp, skip+1)
 }
 ```
 
+1. **无缓冲通道处理**：如果通道无缓冲，直接从发送者复制数据到接收者提供的地址。
+
+2. **有缓冲通道处理**：
+
+   - 从缓冲区取数据到接收者, 并将发送者的数据交换到这个被取出的缓存位置保存
+   - 从队列复制数据到接收者。
+   - 从发送者复制数据到队列。
+   - 更新接收和发送位置，以维护循环缓冲区的行为。
+
+3. **清理发送者数据**：清除发送者 sudog 的 `elem` 字段，避免数据残留。
+
+4. **唤醒发送者 goroutine**：
+
+   - 解锁通道。
+   - 设置发送者 goroutine 的参数。
+   - 标记发送成功。
+   - 更新发送者 sudog 的释放时间。
+   - 将发送者 goroutine 设置为可运行状态。
+
+   
+
 如果是非缓冲型的，就直接从发送者的栈拷贝到接收者的栈。
 
 ```golang
+// 接收发送者的数据到接收者
 func recvDirect(t *_type, sg *sudog, dst unsafe.Pointer) {
-	// dst is on our stack or the heap, src is on another stack.
+	// src 位于发送者, dst 位于接收者
 	src := sg.elem
-	typeBitsBulkBarrier(t, uintptr(dst), uintptr(src), t.size)
-	memmove(dst, src, t.size)
+
+	// 使用类型相关的写屏障处理内存复制
+	// 这个函数将确保在内存复制之前，任何可能的引用都被正确地更新
+	typeBitsBulkBarrier(t, uintptr(dst), uintptr(src), t.Size_)
+	// 由于 src 始终是 Go 内存，因此不需要进行 cgo 写屏障检查。
+	// 对内存执行内存复制操作，大小为 t 的大小
+	// 这里 memmove 实际上是一个 Go 的内存复制函数，不同于 C 的 memmove
+	memmove(dst, src, t.Size_)
 }
 ```
 
-否则，就是缓冲型 channel，而 buf 又满了的情形。说明发送游标和接收游标重合了，因此需要先找到接收游标：
+否则就从缓冲区将数据拷贝到接收者。
 
-```golang
-// chanbuf(c, i) is pointer to the i'th slot in the buffer.
-func chanbuf(c *hchan, i uint) unsafe.Pointer {
-	return add(c.buf, uintptr(i)*uintptr(c.elemsize))
-}
-```
 
-将该处的元素拷贝到接收地址。然后将发送者待发送的数据拷贝到接收游标处。这样就完成了接收数据和发送数据的操作。接着，分别将发送游标和接收游标向前进一，如果发生“环绕”，再从
-0 开始。
-
-最后，取出 sudog 里的 goroutine，调用 goready 将其状态改成 “runnable”，待发送者被唤醒，等待调度器的调度。
-
-- 然后，如果 channel 的 buf 里还有数据，说明可以比较正常地接收。注意，这里，即使是在 channel 已经关闭的情况下，也是可以走到这里的。这一步比较简单，正常地将
-  buf 里接收游标处的数据拷贝到接收数据的地址。
-
-- 到了最后一步，走到这里来的情形是要阻塞的。当然，如果 block 传进来的值是 false，那就不阻塞，直接返回就好了。
-
-先构造一个 sudog，接着就是保存各种值了。注意，这里会将接收数据的地址存储到了 `elem` 字段，当被唤醒时，接收到的数据就会保存到这个字段指向的地址。然后将
-sudog 添加到 channel 的 recvq 队列里。调用 goparkunlock 函数将 goroutine 挂起。
-
-接下来的代码就是 goroutine 被唤醒后的各种收尾工作了。
 
 # 案例分析
 
 从 channel 接收和向 channel 发送数据的过程我们均会使用下面这个例子来进行说明：
 
 ```golang
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
 func goroutineA(a <-chan int) {
-	val := <- a
-	fmt.Println("G1 received data: ", val)
+	val := <-a
+	fmt.Println("goroutine A 已收到 data: ", val)
 	return
 }
 
 func goroutineB(b <-chan int) {
-	val := <- b
-	fmt.Println("G2 received data: ", val)
+	val := <-b
+	fmt.Println("goroutine B 已收到 data: ", val)
 	return
 }
 
@@ -325,30 +418,31 @@ func main() {
 	go goroutineA(ch)
 	go goroutineB(ch)
 	ch <- 3
+	ch <- 4
 	time.Sleep(time.Second)
 }
 ```
 
-首先创建了一个无缓冲的 channel，接着启动两个 goroutine，并将前面创建的 channel 传递进去。然后，向这个 channel 中发送数据
-3，最后 sleep 1 秒后程序退出。
+运行结果:
 
-程序第 14 行创建了一个非缓冲型的 channel，我们只看 chan 结构体中的一些重要字段，来从整体层面看一下 chan 的状态，一开始什么都没有：
+```go
+goroutine B 已收到 data:  3
+goroutine A 已收到 data:  4
+```
+
+- 首先创建了一个无缓冲的 channel，接着启动两个 goroutine，并将前面创建的 channel 传递进去。
+
+- 然后，向这个 channel 中发送数据 3 , 4，最后 sleep 1 秒后程序退出。
+
+来从整体层面看一下 chan 的状态，一开始什么都没有：
 
 ![image-20240615180754038](../../../picture/image-20240615180754038.png)
 
-接着，第 15、16 行分别创建了一个 goroutine，各自执行了一个接收操作。通过前面的源码分析，我们知道，这两个 goroutine （后面称为
-G1 和 G2 好了）都会被阻塞在接收操作。G1 和 G2 会挂在 channel 的 recq 队列中，形成一个双向循环链表。
+接着，第 15、16 行分别创建了一个 goroutine，各自执行了一个接收操作。
 
-在程序的 17 行之前，chan 的整体数据结构如下：
+- 通过前面的源码分析，我们知道，这两个 goroutine （后面称为 G1 和 G2 好了）都会被阻塞在接收操作。
 
-![image-20240615180826760](../../../picture/image-20240615180826760.png)
-
-`buf` 指向一个长度为 0 的数组，qcount 为 0，表示 channel 中没有元素。重点关注 `recvq` 和 `sendq`，它们是 waitq 结构体，而
-waitq 实际上就是一个双向链表，链表的元素是 sudog，里面包含 `g` 字段，`g` 表示一个 goroutine，所以 sudog 可以看成一个
-goroutine。recvq 存储那些尝试读取 channel 但被阻塞的 goroutine，sendq 则存储那些尝试写入 channel，但被阻塞的 goroutine。
-
-此时，我们可以看到，recvq 里挂了两个 goroutine，也就是前面启动的 G1 和 G2。因为没有 goroutine 接收，而 channel 又是无缓冲类型，所以
-G1 和 G2 被阻塞。sendq 没有被阻塞的 goroutine。
+- G1 和 G2 会挂在 channel 的 recq 接收队列中，形成一个双向循环链表。
 
 `recvq` 的数据结构如下：
 
@@ -358,34 +452,8 @@ G1 和 G2 被阻塞。sendq 没有被阻塞的 goroutine。
 
 ![image-20240615180857443](../../../picture/image-20240615180857443.png)
 
-G1 和 G2 被挂起了，状态是 `WAITING`。关于 goroutine 调度器这块不是今天的重点，当然后面肯定会写相关的文章。这里先简单说下，goroutine
-是用户态的协程，由 Go runtime 进行管理，作为对比，内核线程由 OS 进行管理。Goroutine 更轻量，因此我们可以轻松创建数万
-goroutine。
+G1 和 G2 被挂起了，状态是 `WAITING`。
 
-一个内核线程可以管理多个 goroutine，当其中一个 goroutine 阻塞时，内核线程可以调度其他的 goroutine
-来运行，内核线程本身不会阻塞。这就是通常我们说的 `M:N` 模型：
+现在 G1 和 G2 都被挂起了，等待着一个 sender 往 channel 里发送数据，才能得到解救。
 
-![image-20240615180908835](../../../picture/image-20240615180908835.png)
 
-`M:N` 模型通常由三部分构成：M、P、G。M 是内核线程，负责运行 goroutine；P 是 context，保存 goroutine
-运行所需要的上下文，它还维护了可运行（runnable）的 goroutine 列表；G 则是待运行的 goroutine。M 和 P 是 G 运行的基础。
-
-![image-20240615180919268](../../../picture/image-20240615180919268.png)
-
-继续回到例子。假设我们只有一个 M，当 G1（`go goroutineA(ch)`） 运行到 `val := <- a` 时，它由本来的 running 状态变成了 waiting
-状态（调用了 gopark 之后的结果）：
-
-![image-20240615180930495](../../../picture/image-20240615180930495.png)
-
-G1 脱离与 M 的关系，但调度器可不会让 M 闲着，所以会接着调度另一个 goroutine 来运行：
-
-![image-20240615180942108](../../../picture/image-20240615180942108.png)
-
-G2 也是同样的遭遇。现在 G1 和 G2 都被挂起了，等待着一个 sender 往 channel 里发送数据，才能得到解救。
-
-# 参考资料
-
-【深入 channel 底层】https://codeburst.io/diving-deep-into-the-golang-channels-549fd4ed21a8
-
-【Kavya在Gopher Con 上关于 channel
-的设计，非常好】https://speakerd.s3.amazonaws.com/presentations/10ac0b1d76a6463aa98ad6a9dec917a7/GopherCon_v10.0.pdf
