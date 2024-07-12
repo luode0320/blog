@@ -1,24 +1,58 @@
----
-weight: 702
-title: "什么是 Go Scheduler"
-slug: /what-is
----
+# 简介
+
+Go Scheduler 是 Go 语言运行时的核心组件之一，它负责管理和调度 goroutine 的执行。
+
+在 Go 语言中，goroutine 是一种轻量级的线程，它们的创建和切换成本远低于传统的操作系统线程。
+
+Go Scheduler 的主要职责是决定哪些 goroutine 应该在何时何地执行，以及如何在多个 CPU 核心之间分配工作。
+
+
+
+# 主要功能
+
+1. **Goroutine 调度**：Go Scheduler 负责从全局可运行队列中选择 goroutine 来执行。
+
+   并将它们分配给可用的 P（Processor 处理器）结构，P 结构代表了 Go 运行时中的逻辑处理器，每个 P 都绑定到一个 OS 线程上。
+
+2. **工作窃取（Work Stealing）**：为了平衡负载，Go Scheduler 实现了一种工作窃取机制。
+
+   允许空闲的 P 从其他忙碌的 P 的局部可运行队列中窃取 goroutine 来执行。
+
+3. **上下文切换**：当一个 goroutine 需要等待 I/O 操作、系统调用或者主动让出 CPU 时间片时，Go Scheduler 会保存该 goroutine 的状态（即上下文切换），并将 CPU 分配给另一个可运行的 goroutine。
+
+4. **公平调度**：Go Scheduler 力求公平地调度所有 goroutine，以防止某些 goroutine 占用过多的 CPU 时间而导致其他 goroutine 饥饿。
+
+5. **内存管理**：Go Scheduler 还参与了 goroutine 的内存管理，包括 goroutine 栈的分配和调整大小。
+
+
 
 # 什么是 scheduler
 
-Go 程序的执行由两层组成：Go Program，Runtime，即用户程序和运行时。它们之间通过函数调用来实现内存管理、channel 通信、goroutines
-创建等功能。用户程序进行的系统调用都会被 Runtime 拦截，以此来帮助它进行调度以及垃圾回收相关的工作。
+Go 程序的执行由两层组成：
+
+- `Go Program` : 用户程序
+- `Runtime` : 运行时
+
+它们之间通过函数调用来实现**内存管理、channel 通信、goroutines 创建**等功能。
+
+用户程序进行的系统调用都会被 Runtime 拦截，以此来帮助它进行调度以及垃圾回收相关的工作。
 
 一个展现了全景式的关系如下图：
 
 ![image-20240615183452349](../../../picture/image-20240615183452349.png)
 
+
+
 # 为什么要 scheduler
 
-Go scheduler 可以说是 Go 运行时的一个最重要的部分了。Runtime 维护所有的 goroutines，并通过 scheduler 来进行调度。Goroutines
-和 threads 是独立的，但是 goroutines 要依赖 threads 才能执行。
+Go scheduler 可以说是 Go 运行时的一个最重要的部分了。
+
+- Runtime 维护所有的 goroutines，并通过 scheduler 来进行调度。
+- Goroutines 和 threads 是独立的，但是 goroutines 要依赖 threads 才能执行。
 
 Go 程序执行的高效和 scheduler 的调度是分不开的。
+
+
 
 # scheduler 底层原理
 
