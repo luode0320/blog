@@ -247,22 +247,29 @@ func (m *Mutex) lockSlow() {
    - `awoke` 标记当前 Goroutine 是否从阻塞状态被唤醒；
    - `iter` 自旋尝试次数，用于控制自旋频率；
    - `old` 保存互斥锁的旧状态，用于比较和交换操作。
+   
 2. 进入循环：
    a. 检查锁是否被占用且适合自旋，调用 `runtime_canSpin` 函数；
    b. 如果可以自旋，并且当前 Goroutine还未被唤醒且满足条件，则尝试设置 `mutexWoken` 标志位，并执行自旋操作；
    c. 更新自旋次数 `iter`、旧状态 `old`，继续下一轮循环。
+   
 3. 构造新的状态 `new`：
    - 根据当前状态设置新状态，包括锁被占用标志、等待队列计数等；
    - 若当前 Goroutine被标记为唤醒状态，需要重置 `mutexWoken` 标志位。
+   
 4. 尝试使用 CAS 更新状态：
    - 如果成功获取到锁（旧状态为无锁状态），可以直接退出循环；
    - 如果未能成功上锁，可能需要进一步处理。
+   
 5. 在未能成功上锁的情况下，执行以下步骤：
    a. 更新等待开始的时间戳等变量；
    b. 调用 `runtime_SemacquireMutex` 函数尝试获取锁，加入等待队列；
+   
+   <img src="../../../picture/1460000039855708" alt="排队" style="zoom: 50%;" />
    c. 处理是否切换到饥饿模式，并更新旧状态 `old`；
    d. 根据是否饥饿模式和下一次是否需要唤醒队列中的 Goroutine，调整状态；
    e. 标记当前 Goroutine被唤醒，重置自旋次数。
+   
 6. 最终成功获取到锁后，退出循环，如果启用了竞态检测，记录互斥锁的获取。
 
 
@@ -372,21 +379,216 @@ func (m *Mutex) unlockSlow(new int32) {
 
 
 
-## 加锁解锁过程
+## TryLock()尝试加锁
+
+```go
+// TryLock 尝试锁定互斥锁 m，并报告是否成功。
+//
+// 注意：虽然使用 TryLock 的正确场景确实存在，但它们很少见，
+// 使用 TryLock 往往是特定互斥锁使用场景中潜在问题的一个迹象
+func (m *Mutex) TryLock() bool {
+	old := m.state
+
+	// 如果互斥锁当前被锁定或者处于饥饿模式，TryLock 快速失败。
+	if old&(mutexLocked|mutexStarving) != 0 {
+		return false
+	}
+
+	// 尽管可能有其他 goroutine 正在等待互斥锁，但我们当前正在运行，
+	// 我们可以在那个 goroutine 被唤醒之前尝试获取互斥锁。
+	if !atomic.CompareAndSwapInt32(&m.state, old, old|mutexLocked) {
+		return false
+	}
+
+	// 如果启用了竞态检测，记录互斥锁的获取。
+	if race.Enabled {
+		race.Acquire(unsafe.Pointer(m))
+	}
+	
+	return true
+}
+```
+
+`TryLock` 方法的使用应当谨慎，因为它的正确使用场景相对较少。以下是一些关键点：
+
+1. **状态检查**：在尝试获取锁之前，`TryLock` 检查锁的状态是否为 `mutexLocked` 或 `mutexStarving`。如果任一状态被设置，`TryLock` 将立即返回 `false`，表示获取锁失败。
+2. **原子操作**：`TryLock` 使用 `atomic.CompareAndSwapInt32` 来尝试获取锁，这是一个原子操作，确保了即使在多核处理器上也能正确地获取锁。
+3. **竞态检测**：如果竞态检测被启用，`TryLock` 将调用 `race.Acquire` 来记录互斥锁的获取，这对于调试和避免竞态条件非常有用。
+4. **立即返回**：与 `Lock` 方法不同，`TryLock` 不会阻塞等待锁的可用性。如果锁不可用，`TryLock` 将立即返回 `false`，调用者必须准备好处理这种情况。
+
+
+
+`TryLock` 方法是使用 CAS 快速失败的加锁的方式, 它不涉及锁升级。
+
+# 示例
+
+## 加锁解锁示例
 
 ![加锁加锁](../../../picture/1460000039855700)
 
-## 没有加锁，直接解锁问题
+
+
+```go
+package main
+
+import (
+	"sync"
+	"fmt"
+)
+
+var m sync.Mutex
+
+func main() {
+	G1()
+}
+
+func G1() {
+	// 尝试加锁
+	m.Lock()
+
+	// 执行一些任务...
+	fmt.Println("G1 holds the lock")
+
+	// 解锁
+	m.Unlock()
+}
+```
+
+
+
+## 没有加锁，直接解锁示例
 
 ![没有加锁直接解锁](../../../picture/1460000039855707)
 
-## 两个 Goroutine，互相加锁解锁
+```go
+package main
+
+import (
+	"sync"
+)
+
+var m sync.Mutex
+
+func main() {
+	G1()
+}
+
+func G1() {
+	// 尝试解锁
+	m.Unlock()
+}
+```
+
+运行结果:
+
+```go
+fatal error: sync: unlock of unlocked mutex                        
+                                                                   
+goroutine 1 [running]:                                             
+sync.fatal({0x60ecd9?, 0x60?})                                     
+        E:/go-1.21.0/src/runtime/panic.go:1061 +0x18               
+sync.(*Mutex).unlockSlow(0x6c35c0, 0xffffffff)                     
+        E:/go-1.21.0/src/sync/mutex.go:307 +0x35                   
+sync.(*Mutex).Unlock(...)                                          
+        E:/go-1.21.0/src/sync/mutex.go:295                         
+main.G1(...)                                                       
+        C:/Users/rod/GolandProjects/awesomeProject/mian.go:15      
+main.main()                                                        
+        C:/Users/rod/GolandProjects/awesomeProject/mian.go:10 +0x32
+```
+
+
+
+## 两个 Goroutine 互相加锁解锁示例
 
 ![互相加锁解锁](../../../picture/1460000039855706)
 
-## 三个 Goroutine 等待加锁过程
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+var m sync.Mutex
+
+func main() {
+	go G1()
+	go G2()
+	time.Sleep(4 * time.Second) // 让 G1 和 G2 有机会执行
+}
+
+func G1() {
+	// 尝试加锁
+	m.Lock()
+
+	// 执行一些任务...
+	fmt.Println("G1 执行一些任务")
+
+	time.Sleep(2 * time.Second)
+
+	// 解锁
+	m.Unlock()
+}
+
+func G2() {
+	// 尝试加锁
+	m.Lock()
+}
+```
+
+
+
+## 三个 Goroutine 等待加锁示例
 
 ![三个 goroutine 等待加锁](../../../picture/1460000039855704)
+
+```go
+package main
+
+import (
+	"sync"
+	"time"
+	"fmt"
+)
+
+var m sync.Mutex
+
+func main() {
+	go G1()
+	go G2()
+	go G3()
+	time.Sleep(20 * time.Second) // 让 G1、G2 和 G3 有机会执行
+}
+
+func G1() {
+	// 尝试加锁
+	m.Lock()
+
+	// 执行一些任务...
+	fmt.Println("G1 执行一些任务")
+
+	// 让 G2 和 G3 等待
+	time.Sleep(10 * time.Second)
+
+	// 解锁
+	m.Unlock()
+}
+
+func G2() {
+	// 尝试加锁
+	m.Lock()
+}
+
+func G3() {
+	// 尝试加锁
+	m.Lock()
+}
+```
+
+
 
 ## 什么是 Goroutine 排队
 
