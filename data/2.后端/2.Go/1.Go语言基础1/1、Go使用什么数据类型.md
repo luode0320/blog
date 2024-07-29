@@ -21,3 +21,43 @@
 
 - 函数可以作为参数传递，也可以作为返回值返回。Go 中的函数可以有多个返回值，包括错误类型，这是 Go 的一个特色。
 
+
+
+
+
+# 源码分析
+
+通过反射包`src/reflect/type.go`得知, 一共有27种类型。
+
+```go
+const (
+	Invalid Kind = iota
+	Bool
+	Int
+	Int8
+	Int16
+	Int32
+	Int64
+	Uint
+	Uint8
+	Uint16
+	Uint32
+	Uint64
+	Uintptr
+	Float32
+	Float64
+	Complex64
+	Complex128
+	Array
+	Chan
+	Func
+	Interface
+	Map
+	Pointer
+	Slice
+	String
+	Struct
+	UnsafePointer
+)
+```
+
