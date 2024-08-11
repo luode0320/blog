@@ -104,18 +104,3 @@
 * `git push [remote] [branch]`: 上传本地指定分支到远程仓库。
 * `git push [remote] --force`: 强行推送当前分支到远程仓库，即使有冲突。
 * `git push [remote] --all`: 推送所有分支到远程仓库。
-
-## 每日一题
-
-```
-https://github.com/WindrunnerMax/EveryDay
-```
-
-## 参考
-
-```
-https://blog.csdn.net/mine_song/article/details/70770467
-https://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html
-https://www.liaoxuefeng.com/wiki/896043488029600/896067008724000
-```
-
