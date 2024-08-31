@@ -43,16 +43,16 @@ Welcome to Hardhat v2.22.9
   Quit
 ```
 
-我们选择 `Create a JavaScript project` 初始化, 因为网上大多数教程都是基于 `JavaScript`。
+我们选择 `Create a TypeScript project` 初始化, 因为 `TypeScript ` 是强类型的, 我们可以看到结构的定义。
 
-![image-20240826005201029](../../../picture/image-20240826005201029.png)
+![image-20240828014033590](../../../picture/image-20240828014033590.png)
 
 1. **contracts**：存放你的智能合约源码。在这里，你可以创建`.sol`文件来编写Solidity智能合约。
-2. **ignition**：Ignition是Hardhat的一个插件，用于加速本地开发环境的启动速度。它会在后台预编译智能合约，以便更快地运行测试和部署。
+2. **ignition**：Ignition是Hardhat的一个插件，用于加速本地开发环境的启动速度。我们不使用, 删除。
 3. **node_modules**：存储项目依赖项的文件夹。当使用`yarn`或`npm`安装依赖项时，它们会被下载到这里。
 4. **test**: 存放测试合约的测试代码。在这里可以编写测试的脚本。
 5. **.gitignore**：用于指定哪些文件或文件夹应该被Git忽略。这对于避免不必要的文件（如编译生成的文件、日志文件等）进入版本控制系统非常有用。
-6. **hardhat.config.js**：Hardhat项目的配置文件。在这里，你可以指定编译器设置、网络配置、测试策略等。
+6. **hardhat.config.ts**：Hardhat项目的配置文件。在这里，你可以指定编译器设置、网络配置、测试策略等。
 7. **package.json**：记录项目依赖项、版本和其他元数据的文件。当你使用`yarn`或`npm`安装新包时，它们会被添加到这个文件中。
 8. **README.md**：项目说明文件，通常包含项目简介、安装和使用说明等内容。
 
