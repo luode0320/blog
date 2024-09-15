@@ -151,7 +151,7 @@ abstract contract A {
 
 ```solidity
 contract C is A {
-    constructor(uint _c) A(_c * _c) {}
+    constructor(uint _c) A(_c) {}
 }
 ```
 
