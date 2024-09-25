@@ -8,7 +8,7 @@
 
 `runtime/chan.go`
 
-```golang
+```go
 // 表示通道的内部数据结构。结构体中包含了用于管理通道的各种字段
 // 如队列中的数据量、队列大小、缓冲区、元素大小、关闭标志、元素类型等。
 // 同时还包含了用于管理 发送 和 接收 等待者的等待队列，以及一个互斥锁来保护通道的所有字段。
@@ -45,7 +45,7 @@ type hchan struct {
 
 - `waitq` 是 `sudog` 的一个双向链表，而 `sudog` 实际上是对 goroutine 的一个封装：
 
-```golang
+```go
 // 表示等待队列的结构。该结构体包含了两个字段，分别指向队列中第一个 sudog 和最后一个 sudog。
 // sudog 是表示与 goroutine 相关的结构体，在这里用来管理等待通道操作的 goroutine。
 type waitq struct {
@@ -72,17 +72,28 @@ type waitq struct {
 一般而言，使用 `make` 创建一个能收能发的通道：
 
 ```golang
+// 定义一个只发送的通道类型
+type Sender chan<- int
+// 定义一个只接收的通道类型
+type Receiver <-chan int
+
 // 无缓冲通道
 ch1 := make(chan int)
 // 有缓冲通道
 ch2 := make(chan int, 10)
+
+
+// 将普通通道转换为只发送的通道, 但是原来的ch依旧可以接受
+sender := Sender(ch)
+// 将普通通道转换为只接收的通道, 但是原来的ch依旧可以发送
+receiver := Receiver(ch)
 ```
 
 # makechan源码
 
 最终创建 chan 的函数是 `makechan`：
 
-```golang
+```go
 // 用于创建一个通道并返回指向该通道的指针。
 // 在函数中进行了元素大小、内存分配、对齐等方面的检查。
 // 根据元素是否包含指针，选择不同的分配方式，并且初始化相应的字段，最后返回创建好的通道指针。

@@ -24,7 +24,7 @@
 
    如果 channel 被关闭，`range` 循环会终止。
 
-# chanrecv源码
+# chanrecv接收源码
 
 `runtime/chan.go`
 
@@ -35,7 +35,7 @@
 
 当接收到相应类型的零值时无法知道是真实的发送者发送过来的值，还是 channel 被关闭后，返回给接收者的默认类型的零值。
 
-```golang
+```go
 // 处理不带 "ok" 的情形
 func chanrecv1(c *hchan, elem unsafe.Pointer) {
 	chanrecv(c, elem, true)
@@ -53,7 +53,7 @@ func selectnbrecv(elem unsafe.Pointer, c *hchan) (selected, received bool) {
 
 无论如何，最终转向了 `chanrecv` 函数：
 
-```golang
+```go
 // 在通道 c 上接收数据，并将接收到的数据写入 ep。
 // ep 可以为 nil，在这种情况下，接收到的数据会被忽略。
 // 如果 block 为 false 且没有元素可用，则返回 (false, false)。
@@ -277,7 +277,7 @@ if sg := c.sendq.dequeue(); sg != nil {
 }
 ```
 
-```golang
+```go
 // 处理在满通道 c 上的接收操作。
 // 包含两个部分：
 //  1. 发送者 sg 发送的值被放入通道中，

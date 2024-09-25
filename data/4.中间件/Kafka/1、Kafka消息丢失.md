@@ -25,7 +25,8 @@ Kafka存在丢消息的问题，消息丢失会发生在Broker，Producer和Cons
 > producer生产者是通过ack机制，处理消息丢失
 
 - **acks=0**，producer不等待broker的响应，效率最高，但是消息很可能会丢。
-- **acks=1**，leader broker收到消息后，不等待其他follower副本的响应，即返回ack。也可以理解为ack数为1。此时，如果follower副本还没有收到leader同步的消息leader就挂了，那么消息会丢失。
+- **acks=1**，leader
+  broker收到消息后，不等待其他follower副本的响应，即返回ack。也可以理解为ack数为1。此时，如果follower副本还没有收到leader同步的消息leader就挂了，那么消息可能会丢失。
 - **acks=-1**，leader broker收到消息后，挂起，等待所有ISR的列表follower副本返回结果后，再返回ack。这种配置下，只有leader写入数据到pagecache是不会返回ack的，还需要所有ISR的列表follower副本返回“成功”才会触发ack。
 
 
@@ -77,4 +78,4 @@ Kafka存在丢消息的问题，消息丢失会发生在Broker，Producer和Cons
 
 像这种情况在Java中, 我们需要手动提交offset偏移量
 
-如果是go中, 实际上不管是手动还是自动, 都需要调用提交标志, 所以不会出现这种情况
+如果是go中, 实际上不管是手动还是自动, **都需要调用提交标志**, 所以不会出现这种情况

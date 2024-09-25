@@ -66,7 +66,7 @@ top:
 
 非主 goroutine 退出, 直接调用 `runtime·goexit1`：
 
-```golang
+```go
 
 // 完成当前 goroutine 的执行。
 // 这个函数确保在 goroutine 结束前执行一些清理工作，
@@ -105,7 +105,7 @@ func goexit1() {
 
 这里的参数是传递过来的`goexit0`, 这里会作为会回调执行
 
-```golang
+```c
 // func mcall(fn func(*g))
 // 切换到 m->g0 的栈上，调用 fn(g)。
 // fn 函数不应该返回，它应该调用 gogo(&g->sched) 来继续运行 g。
@@ -159,7 +159,7 @@ TEXT runtime·mcall(SB), NOSPLIT, $0-8
 
 ## goexit0退出时要执行的流程
 
-```golang
+```go
 // goexit0 函数在 g0 上继续执行 goexit 流程。
 func goexit0(gp *g) {
 	// 获取当前 goroutine 所在的 m 对象。

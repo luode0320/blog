@@ -26,7 +26,7 @@
 
 `runtime/chan.go`
 
-```golang
+```go
 // c <- x从编译代码的入口点。
 //
 //go:nosplit
@@ -199,8 +199,6 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 1. **检查通道**：首先检查通道 `c` 是否为 `nil`，如果是，并且是非阻塞模式，那么直接返回 `false`。如果是阻塞模式，调用 `gopark`
    进行阻塞。
 
-2. **竞争检测**：如果启用了竞争检测，记录当前函数调用的位置。
-
 3. **快速路径检查**：如果非阻塞并且通道已关闭或满，立即返回 `false`。
 
 4. **加锁**：获取通道的锁。
@@ -225,15 +223,11 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 
 14. **挂起 goroutine**：调用 `gopark` 函数，挂起当前 goroutine，等待通道锁被释放。
 
-15. **保持数据活动**：调用 `KeepAlive` 确保发送的数据在等待期间不会被垃圾回收。
-
 16. **唤醒处理**：有一个接收着从队列里面读取了我们发送者阻塞的 goroutine,goroutine 被唤醒后
 
     并将发送的数据从 我们此发送者的 goroutine 写入到了 它接收者的 goroutine
 
 17. **释放 sudog**：释放 sudog，因为它不再需要，同时检查通道是否已关闭。
-
-18. **检查通道状态**：如果通道在等待期间被关闭，触发 panic。
 
 下面将详细解析下部分过程中的代码:
 
@@ -255,7 +249,7 @@ if sg := c.recvq.dequeue(); sg != nil {
 
 - 如果能从等待接收队列 recvq 里出队一个 sudog（代表一个 goroutine）。
 
-```golang
+```go
 // send 函数处理向一个空的 channel 发送操作
 // ep 指向被发送的元素，会被直接拷贝到接收的 goroutine
 // 之后，接收的 goroutine 会被唤醒
@@ -285,7 +279,7 @@ func send(c *hchan, sg *sudog, ep unsafe.Pointer, unlockf func(), skip int) {
 		}
 	}
 
-	// 如果 sg 中的 elem 不为 nil，这表示 sg 已经准备好接收数据
+	// 如果 sg 中的 elem 不为 nil，这表示 sg 已经准备发送数据
 	if sg.elem != nil {
 		// 直接将 sg 中的值发送到通道 c 中
 		sendDirect(c.elemtype, sg, ep)
@@ -293,7 +287,7 @@ func send(c *hchan, sg *sudog, ep unsafe.Pointer, unlockf func(), skip int) {
 		sg.elem = nil
 	}
 
-	// 获取此 goroutine
+	// 获取接收者 goroutine
 	gp := sg.g
 	// 使用 unlockf 解锁通道 c
 	unlockf()
@@ -315,20 +309,17 @@ func send(c *hchan, sg *sudog, ep unsafe.Pointer, unlockf func(), skip int) {
 }
 ```
 
-1. **竞争检测**：如果启用了竞争检测，根据通道是否为无缓冲，进行相应的同步和通知操作，确保并发访问的正确性。
 2. **复制数据**：如果接收方 sudog 的 `elem` 字段不为 `nil`，表明接收方已准备好接收数据，调用 `sendDirect` 函数将发送方的数据复制到接收方。
 3. **清理 sudog**：将 sudog 的 `elem` 字段设为 `nil`，避免重复发送或数据残留。
 4. **解锁通道**：调用 `unlockf` 函数解锁通道，因为发送操作已完成。
-5. **设置参数**：将 sudog 的指针设置为接收方 goroutine 的 `param` 字段，以便接收方在恢复时能够访问到 sudog。
 6. **标记成功**：设置 sudog 的 `success` 字段为 `true`，表明发送成功。
-7. **更新释放时间**：如果 sudog 的 `releasetime` 不为零，更新为当前时间戳。
 8. **唤醒接收者**: 唤醒的goroutine, 处理接收的数据
 
 ## sendDirect两个goroutine传递数据
 
 继续看 `sendDirect` 函数：
 
-```golang
+```go
 // 在无缓冲或空缓冲通道上发送和接收是唯一的操作，其中一个运行的 goroutine 写入另一个运行 goroutine 的堆栈。
 // 垃圾回收器假定堆栈写入仅发生在 goroutine 运行时，并且仅由该 goroutine 执行。
 // 使用写屏障足以弥补这一假设的违反，但写屏障必须有效。
@@ -363,7 +354,7 @@ func sendDirect(t *_type, sg *sudog, src unsafe.Pointer) {
 
 好了，看完源码。我们接着来分析例子，代码如下：
 
-```golang
+```go
 package main
 
 import (

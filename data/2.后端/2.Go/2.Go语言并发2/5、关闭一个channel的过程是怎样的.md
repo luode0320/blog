@@ -19,7 +19,7 @@
 
 关闭某个 channel，会执行函数 `closechan`：
 
-```golang
+```go
 // 关闭一个通道。
 // 如果通道为 nil，将触发 panic。
 // 如果通道已经被关闭，再次调用此函数也将触发 panic。
