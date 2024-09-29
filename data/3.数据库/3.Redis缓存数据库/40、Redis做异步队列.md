@@ -104,6 +104,8 @@ func getTaskFromQueue(ctx context.Context, rdb *redis.Client) (string, error) {
 
 ZSet 可以用来实现带有优先级的任务队列。通过将任务的时间戳或者优先级作为分数存储，可以很容易地管理任务的顺序。
 
+- ZSet的结构不能阻塞获取, 如果没有任何数据, 会返回空
+
 #### 示例：
 
 ```go
@@ -200,6 +202,12 @@ func getHighestPriorityTask(ctx context.Context, rdb *redis.Client) (string, err
 ### 使用 Pub/Sub 模型
 
 Redis 还支持发布/订阅模式，可以用来实现事件驱动的架构。
+
+- Redis 的发布订阅（Pub/Sub）模式下，**如果在消息发布时没有订阅者，那么这条消息将会丢失**。
+
+- 这是因为 Pub/Sub 模式设计为实时消息传递，消息一旦发布就会立即广播给所有订阅了相应频道的客户端。
+
+- 如果当时没有订阅者，那么消息就不会被任何客户端接收到。
 
 #### 示例：
 
