@@ -45,10 +45,10 @@ contractInstance.methods.transfer('0x1234567890...', 100)
 
 ### 解释
 
-1. **`web3.utils.toWei`**：将 1 ETH 转换成 Wei。`toWei` 方法接受两个参数：一个是数值，另一个是单位（如 `'ether'`）。
-2. **`options` 对象**：包含交易的元数据，如发送者的地址和转移的数量。
-3. **`contractInstance.methods.transfer(...)`**：调用合约的 `transfer` 方法。
-4. **`.send(options)`**：发送交易，并等待交易确认。
+1. `web3.utils.toWei`：将 1 ETH 转换成 Wei。`toWei` 方法接受两个参数：一个是数值，另一个是单位（如 `'ether'`）。
+2. `options` 对象：包含交易的元数据，如发送者的地址和转移的数量。
+3. `contractInstance.methods.transfer(...)`：调用合约的 `transfer` 方法。
+4. `.send(options)`：发送交易，并等待交易确认。
 
 ### 更完整的示例
 
