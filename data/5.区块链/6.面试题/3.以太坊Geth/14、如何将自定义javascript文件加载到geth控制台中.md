@@ -1,6 +1,6 @@
 ### 如何将自定义javascript文件加载到geth控制台中
 
-通使用 **--preload** 选项传入js文件的路径。
+使用 **--preload** 选项传入js文件的路径。
 
 ```
     --preload value                                                        (%GETH_PRELOAD%)
@@ -34,7 +34,7 @@ console.log(`The balance of ${address} is ${balance}.`);
 geth --datadir /path/to/data/folder --preload /path/to/preload.js console
 ```
 
-​ 如果你有多个脚本文件需要预加载，可以将它们用逗号分隔：
+如果你有多个脚本文件需要预加载，可以将它们用逗号分隔：
 
 ```sh
 geth --datadir /path/to/data/folder --preload /path/to/preload1.js,/path/to/preload2.js console

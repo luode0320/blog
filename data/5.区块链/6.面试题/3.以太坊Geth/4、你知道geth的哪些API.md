@@ -12,16 +12,20 @@ Geth 提供了大量的 JSON-RPC API，这些 API 可以让你执行各种与以
 
 #### Web3 相关的 API
 
+![image-20240917165925989](../../../picture/image-20240917165925989.png?lastModify=1726563868)
+
 1. **web3_clientVersion**
     - 返回客户端的版本信息。
 2. **web3_sha3**
     - 计算数据的 Keccak-256 哈希值。
 
-![image-20240917165925989](../../../picture/image-20240917165925989.png?lastModify=1726563868)
+
 
 ### Eth API
 
 #### 通用的以太坊 API
+
+![image-20240917170556933](../../../picture/image-20240917170556933.png)
 
 1. **eth_protocolVersion**
     - 返回客户端的协议版本。
@@ -104,11 +108,13 @@ Geth 提供了大量的 JSON-RPC API，这些 API 可以让你执行各种与以
 40. **eth_signTypedData**
     - 使用私钥对类型化的数据进行签名。
 
-![image-20240917170556904](../../../picture/image-20240917170556904.png)![image-20240917170556933](../../../picture/image-20240917170556933.png)
+
 
 ### Net API
 
 #### 网络相关的 API
+
+![image-20240917170618047](../../../picture/image-20240917170618047.png)
 
 1. **net_version**
     - 返回网络ID。
@@ -117,13 +123,15 @@ Geth 提供了大量的 JSON-RPC API，这些 API 可以让你执行各种与以
 3. **net_listening**
     - 检查客户端是否正在监听网络。
 
-![image-20240917170618047](../../../picture/image-20240917170618047.png)
+
 
 ### Personal API
 
 只能用web3调用。
 
 #### 与账户管理相关的 API
+
+![image-20240917170640703](../../../picture/image-20240917170640703.png)
 
 1. **personal_importRawKey**
     - 导入一个未加密的私钥。
@@ -142,13 +150,13 @@ Geth 提供了大量的 JSON-RPC API，这些 API 可以让你执行各种与以
 8. **personal_updateAccount**
     - 更新账户密码。
 
-![image-20240917170640703](../../../picture/image-20240917170640703.png)
-
 ### Admin API
 
 默认情况下，Geth 的 Admin API 并不是自动启用的，因为它包含了一些可能会影响节点安全性的管理功能。
 
 #### 管理节点相关的 API
+
+![image-20240917170248763](../../../picture/image-20240917170248763.png)
 
 1. **admin_addPeer**
     - 添加一个静态节点。
@@ -169,11 +177,11 @@ Geth 提供了大量的 JSON-RPC API，这些 API 可以让你执行各种与以
 9. **admin_stopWS**
     - 停止 WebSocket 服务器。
 
-![image-20240917170248763](../../../picture/image-20240917170248763.png)
-
 ### Debug API
 
 #### 调试相关的 API
+
+![image-20240917170350546](../../../picture/image-20240917170350546.png)
 
 1. **debug_backtraceAt**
     - 返回给定事务的回溯。
@@ -220,11 +228,11 @@ Geth 提供了大量的 JSON-RPC API，这些 API 可以让你执行各种与以
 22. **debug_tracingOff**
     - 关闭追踪。
 
-![image-20240917170350546](../../../picture/image-20240917170350546.png)
-
 ### Txpool API
 
 #### 交易池相关的 API
+
+![image-20240917170432352](../../../picture/image-20240917170432352.png)
 
 1. **txpool_content**
     - 获取交易池的内容。
@@ -233,5 +241,5 @@ Geth 提供了大量的 JSON-RPC API，这些 API 可以让你执行各种与以
 3. **txpool_status**
     - 获取交易池的状态。
 
-![image-20240917170432352](../../../picture/image-20240917170432352.png)
+
 
