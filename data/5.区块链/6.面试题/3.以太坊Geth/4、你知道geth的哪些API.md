@@ -17,7 +17,7 @@ Geth 提供了大量的 JSON-RPC API，这些 API 可以让你执行各种与以
 2. **web3_sha3**
     - 计算数据的 Keccak-256 哈希值。
 
-![image-20240917165925989](file://E:/blog/data/picture/image-20240917165925989.png?lastModify=1726563868)
+![image-20240917165925989](../../../picture/image-20240917165925989.png?lastModify=1726563868)
 
 ### Eth API
 
