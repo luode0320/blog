@@ -10,14 +10,14 @@
 
 1. sleep 是 Thread 类的静态本地⽅法，wait 则是 Object 类的本地⽅法。 
    - 为什么wait 是 Object 类的本地⽅法?
-   - 看这着篇[为什么wait 是 Object 类的本地⽅法?]()
+   - 看下一篇[为什么wait 是 Object 类的本地⽅法?]()
 
 2. sleep⽅法不会释放lock，但是wait会释放，⽽且sleep⽅法会加⼊到等待队列中。
    - sleep就是把cpu的执⾏资格和执⾏权释放出去，不再运⾏此线程，当定时时间结束再取回cpu资源
 
 3. sleep⽅法不依赖于同步器synchronized，但是wait需要依赖synchronized关键字。 
    - 为什么wait需要依赖synchronized关键字?
-   - 看这着篇[为什么wait需要依赖synchronized关键字?]()
+   - 看下一篇[为什么wait需要依赖synchronized关键字?]()
 
 4. sleep不需要被唤醒（休眠之后推出阻塞），但是wait需要（不指定时间需要被别⼈中断）。 
    - wait需要用notify唤醒的原因是可以进行`线程通信`

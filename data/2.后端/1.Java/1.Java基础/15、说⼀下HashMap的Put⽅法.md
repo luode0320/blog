@@ -42,13 +42,11 @@ tab[i] = newNode(hash, key, value, null);
       }
       ```
 
-      
-
       3. 将key和value封装为Node插⼊到链表或红⿊树中后，再判断是否需要进⾏扩容，如果需要就扩容，如果不需要就结束PUT⽅法
 
       ```java
-      if (++size > threshold)
+
+if (++size > threshold)
           resize();
       ```
-
       

@@ -32,7 +32,7 @@
 
 - 这样做的目的是因为HashMap、HashSet和Hashtable这些数据结构
 - 这些数据结构先用hashCode找到数组的索引位置,hashCode函数不变,所以数组的索引位置也不会变
-- 然后用equals比较key,相同的key就替换,不同就添加都链表后边
+- 然后用equals比较key,相同的key就替换,不同就添加到链表后边
 - 本来equals比较相同key是替换,现在改写了equals,上次hashCode计算相同的key用这个equals可能不相同了
   - 追加到了链表后边,就出现了这个数据结构中出现了2个实际上是相同的key,之后get的时候有2个会出错的
 

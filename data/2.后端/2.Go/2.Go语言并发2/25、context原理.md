@@ -158,7 +158,7 @@ type todoCtx struct{ emptyCtx }
 
 主要有这4个常用的创建方法:
 
-```golang
+```go
 // 用途: 创建一个带有取消功能的 Context。
 // 参数: 接收一个父 Context，通常是 Background() 或 TODO()。
 // 返回值:

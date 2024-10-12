@@ -16,5 +16,5 @@
 >
 > 双向链表队列变量在AQS类中`private transient volatile Node head;`
 >
-> 加锁线程变量在**`AOS`**类中`private transient Thread exclusiveOwnerThread;`
+> 加锁线程变量在`AOS`类中`private transient Thread exclusiveOwnerThread;`
 

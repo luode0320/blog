@@ -10,7 +10,7 @@
 
 > List
 
-- List用的最多的就是ArrayList和LinkedList
+- List用的最多的就是ArrayList(提示: 任何时候都不要使用 Java 的 LinkedList)
 - 因为ArrayList底层是数组,LinkedList底层是链表,这两种数据结构添加数据都只是在末尾添加,并不需要判断数据是否会重复
 - 所以List中的元素是可以重复的
 - 并且因为都是在末尾添加数据,所以存数据的顺序,和取出数据的顺序都是有序的
