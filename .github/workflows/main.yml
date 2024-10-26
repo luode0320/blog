@@ -10,12 +10,12 @@ on:
   workflow_dispatch:
     inputs:
       name:
-        description: '手动执行'
+        description: "手动执行"
         required: true
-        default: 'World'
+        default: "World"
   push:
     branches:
-      - main # 触发条件为 push main分支
+      - master # 触发条件为 push main分支
 # 任务
 jobs:
   docker: # 描述词, 无实际意义
@@ -37,7 +37,8 @@ jobs:
           username: root
           password: ${{ secrets.REMOTE_PASSWORD }}
           port: 22 # 公网22端口
-          script: | # 远程服务器依次执行下面的命令, 删除容器, 删除镜像, 拉取最新镜像, 启动blog容器
+          script:
+            | # 远程服务器依次执行下面的命令, 删除容器, 删除镜像, 拉取最新镜像, 启动blog容器
             docker rm -f blog
             docker rmi luode0320/blog:latest
             rm -R -f /usr/local/src/blog/data
