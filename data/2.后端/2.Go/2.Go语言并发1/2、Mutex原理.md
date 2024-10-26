@@ -242,7 +242,8 @@ func (m *Mutex) lockSlow() {
    a. 更新等待开始的时间戳等变量；
    b. 调用 `runtime_SemacquireMutex` 函数尝试获取锁，加入等待队列；
 
-   <img src="../../../picture/1460000039855708" alt="排队" style="zoom: 50%;" />
+   ![image-20240814021639934](../../../picture/1460000039855708)
+   
    c. 处理是否切换到饥饿模式，并更新旧状态 `old`；
    d. 根据是否饥饿模式和下一次是否需要唤醒队列中的 Goroutine，调整状态；
    e. 标记当前 Goroutine被唤醒，重置自旋次数。

@@ -279,7 +279,7 @@ next:
 - `0 号` bucket 暂未搬迁 (最终也会搬迁为 0 和 2 号)
 - 老的 bucket 挂在在 `*oldbuckets` 指针上面，新的 bucket 则挂在 `*buckets` 指针上面。
 
-<img src="../../../picture/image-20240615182238369.png" alt="image-20240615182238369" style="zoom:200%;" />
+![image-20240814021639934](../../../picture/image-20240615182238369.png)
 
 这时，我们对此 map 进行遍历。
 
@@ -289,7 +289,7 @@ next:
 
 下面这张图就是开始遍历时的状态：
 
-<img src="../../../picture/image-20240615182248703.png" alt="image-20240615182248703" style="zoom:200%;" />
+![image-20240814021639934](../../../picture/image-20240615182248703.png)
 
 标红的表示起始位置，buckets 遍历顺序为：`3 -> 0 -> 1 -> 2`。
 

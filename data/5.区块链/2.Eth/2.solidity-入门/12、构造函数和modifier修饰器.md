@@ -41,7 +41,7 @@ contract Parents {
 
 它就像钢铁侠的智能盔甲，穿上它的函数会带有某些特定的行为。
 
-<img src="../../../picture/nVwXsOVmrYu8rqvKKPMpg.jpg" alt="钢铁侠的modifier" style="zoom:80%;" />
+![image-20240814021639934](../../../picture/nVwXsOVmrYu8rqvKKPMpg.jpg)
 
 `modifier`的主要使用场景是运行函数前的检查，例如地址，变量，余额等。
 

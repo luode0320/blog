@@ -53,7 +53,7 @@ Trie 被称为字典树，又称单词查找树或键树，常用于统计和排
 
 它能够最大限度减少无谓的字符串比较，查询效率较高。
 
-<img src="../../picture/trie_structure.png" alt="trie_structure" style="zoom:30%;" />
+![image-20240814021639934](../../picture/trie_structure.png)
 
 #### 性质
 
@@ -64,7 +64,7 @@ Trie 被称为字典树，又称单词查找树或键树，常用于统计和排
 
 #### 结点内部实现
 
-<img src="../../picture/trie_nodes.png" alt="trie_nodes" style="zoom:30%;" />
+![image-20240814021639934](../../picture/trie_nodes.png)
 
 字典树的高度较低，但占用的存储空间较大，核心思想是空间换时间。
 
@@ -199,7 +199,7 @@ class Trie {
 
 而以太坊真正采用的是 Modified MPT 结构，其结构如下
 
-<img src="../../picture/modified_merkle_pactricia_trie.png" alt="modified_merkle_pactricia_trie" style="zoom:30%;" />
+![image-20240814021639934](../../picture/modified_merkle_pactricia_trie.png)
 
 每次发布新的区块时，状态树中的新节点的值会发生变化，并不是更改原值，而是新建一些分支，保留原来的状态（因此可以实现回滚）。
 
