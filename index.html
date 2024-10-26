@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>探索之旅</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="./Static/vue.css">
+    <link rel="stylesheet" href="./Static/gitalk.css">
+    <link rel="stylesheet" href="./Static/sidebar.min.css">
+    <!-- <meta name="referrer" content="no-referrer"> -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="//www.googletagmanager.com/gtag/js?id=G-57PHBXT1C5"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag("js", new Date());
+        gtag("config", "G-57PHBXT1C5");
+    </script>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <div id="app">加载中! 很快...</div>
+    <script>
+        window.$docsify = {
+            // 侧边栏左侧的logo
+            logo: './Static/png/index.svg',
+            // 侧边栏顶部的标题
+            name: 'luode',
+            // 点击标题后的跳转地址
+            nameLink: 'https://luode.vip',
+            // 右上角图标
+            repo: 'https://github.com/luode0320/blog',
+            // 侧边栏支持，默认加载的是项目根目录下的_sidebar.md文件
+            loadSidebar: true,
+            // 导航栏支持，默认加载的是项目根目录下的_navbar.md文件
+            loadNavbar: false,
+            // 封面支持，默认加载的是项目根目录下的_coverpage.md文件
+            coverpage: false,
+            // 小屏设备下合并导航栏到侧边栏
+            mergeNavbar: true,
+            // 其他配置选项...
+            auto2top: true,
+            // 颜色
+            themeColor: "#42b983",
+            // 右侧目录的标题层级
+            maxLevel: 3,
+            // 左侧层级
+            subMaxLevel: 0,
+            search: {
+                paths: "auto",
+                placeholder: "搜索...",
+                noData: "找不到结果",
+                depth: 1,
+            },
+            // 入口文件改为 /home.md
+            homepage: '/HOME.md',
+            alias: {
+                "/.*/_sidebar.md": "/_sidebar.md"
+            },
+            plugins: [],
+            requestHeaders: {
+                // "cache-control": "no-cache",
+            },
+            count:{
+                countable:true,
+                fontsize:'0.9em',
+                color:'rgb(90,90,90)',
+                language:'chinese',
+                position: "bottom",
+                isExpected: false,
+            },
+            // 章节
+            pagination: {
+                previousText: '上一章节',
+                nextText: '下一章节',
+                crossChapter: true,
+                crossChapterText: true,
+            },
+            // 进度条
+            progress: {
+                position: "bottom",
+                color: "var(--theme-color,#42b983)",
+                height: "3px",
+            },
+        }
+    </script>
+    <script src="./Static/docsify.min.js"></script>
+    <!-- 搜索 -->
+    <script src="./Static/search.min.js"></script>
+    <script src="./Static/catalog.js"></script>
+    <!-- 侧边栏 -->
+    <script src="./Static/docsify-sidebar-collapse.js"></script>
+    <!-- 复制文本 -->
+    <script src="./Static/docsify-copy-code@2.1.1.js"></script>
+    <!-- 分页 -->
+    <script src="./Static/docsify-pagination.min.js"></script>
+    <!-- 统计数字 -->
+    <script src="./Static/countable.js"></script>
+    <script src="./Static/gitalk.min.js"></script>
+    <script src="./Static/blueimp-md5@2.19.0.js"></script>
+    <!-- emoji表情支持 -->
+    <script src="./Static/emoji.min.js"></script>
+    <!-- 图片放大缩小支持 -->
+    <script src="./Static/zoom-image.min.js"></script>
+    <!-- 进度条 https://github.com/HerbertHe/docsify-progress -->
+    <script src="./Static/progress.min.js"></script>
+    <!-- 语法高亮 https://cdn.jsdelivr.net/npm/prismjs@1/components/ -->
+    <script src="./Static/language/bash.min.js"></script>
+    <script src="./Static/language/go.min.js"></script>
+    <script src="./Static/language/java.min.js"></script>
+    <script src="./Static/language/json.min.js"></script>
+    <script src="./Static/language/python.min.js"></script>
+    <script src="./Static/language/yaml.min.js"></script>
+
+</body>
+
+</html>
