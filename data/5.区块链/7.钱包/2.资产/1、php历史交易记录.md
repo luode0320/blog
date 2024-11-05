@@ -6,3 +6,4 @@
 [2024-10-24 06:42:57] ServerDev.INFO: 获取历史记录，url=http://wallettest.ellipal.com/api/getHistoryApi?cType=TON&address=UQB4Yn0O6jdbqJGF3KK7DWWXhlVjv9VIIyyZ-1qbYGNDNYvf&contractAddr=&gLang=zh-cn&direction=all&regType=1&shortNameEOS= 
 ```
 
+\

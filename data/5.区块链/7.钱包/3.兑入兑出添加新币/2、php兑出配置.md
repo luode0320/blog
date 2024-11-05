@@ -109,13 +109,38 @@ if ($pairRshow == "TON(TON)") {
 - 汇率查询时要使用 代币(主链) 的参数, 需要配置字段
 
 ```php
-                case 'TON':
+    /*
+     * 获取单个钱包信息接口【V4版本】
+     * Alan 2024年5月10日
+     */
+
+    public function getBalanceV4(Request $request){
+				case 'TON':
                     if (!empty($v->contractAddr)) {
                         $exchangeTagshort .= '(TON)';
                     }
                     break;
+    }
+
 ```
 
 
 
 ![image-20241026143820331](../../../picture/image-20241026143820331.png)
+
+
+
+```php
+    /*
+     * 获取多个钱包的地址信息接口【V4】
+     * 2024年5月10日
+     */
+
+    public function getBalancelistV4(Request $request){
+                if ($cType == "TON" && !empty($v->contractAddr)) {
+                    $exchangeTagshort .= '(TON)';
+                }
+    }
+```
+
+![image-20241029112012572](../../../picture/image-20241029112012572.png)
