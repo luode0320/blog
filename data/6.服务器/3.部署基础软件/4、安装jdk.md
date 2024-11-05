@@ -25,3 +25,33 @@ OpenJDK Runtime Environment (build 1.8.0_382-b05)
 OpenJDK 64-Bit Server VM (build 25.382-b05, mixed mode)
 ```
 
+
+
+# 配置
+
+检查路径
+
+```sh
+update-alternatives --display java
+```
+
+配置
+
+```sh
+vi /etc/profile
+```
+
+```sh
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+```
+
+```sh
+source /etc/profile
+source ~/.bashrc
+```
+
+```sh
+echo $JAVA_HOME
+```
+
