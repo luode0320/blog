@@ -1,3 +1,11 @@
+<!--
+ * @Author: luode 1846555387@qq.com
+ * @Date: 2024-11-03 18:16:32
+ * @LastEditors: luode 1846555387@qq.com
+ * @LastEditTime: 2024-11-09 18:08:38
+ * @FilePath: \blog\data\6.服务器\3.部署基础软件\9、安装Git小乌龟.md
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 # 下载
 
 [蓝奏云](https://www.ilanzou.com/s/rBIyHrQN)
