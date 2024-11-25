@@ -343,22 +343,28 @@ curl -v \
 -o baidu.html https://www.baidu.com
 ```
 
+发送 POST 请求，并将 JSON 数据作为请求体传递
 
+```sh
+curl -X POST http://192.168.1.195:12345/api/getHistory \
+     -H "Content-Type: application/json" \
+     -d '{
+           "coinName": "ETH",
+           "address": "0xba7e796f0d92319EC0E14dc72129bB1B826E9690",
+           "contractAddr": "",
+           "direction": "in",
+           "startTime": "","endTime": "","limit": 10
+         }'
 
-
-
-
-
-## 每日一题
-
+# 使用jq格式化json输出
+curl -X POST http://192.168.1.195:12345/api/getHistory \
+     -H "Content-Type: application/json" \
+     -d '{
+           "coinName": "DOGE",
+           "address": "DGNT1TsXqv78BJARTyL9uomfR7X2nkJ3jL",
+           "contractAddr": "",
+           "direction": "out",
+           "startTime": "","endTime": "","limit": 10
+         }' | jq
 ```
-https://github.com/WindrunnerMax/EveryDay
-```
 
-## 参考
-
-```
-https://www.computerhope.com/unix/curl.htm
-https://www.commandlinux.com/man-page/man1/curl.1.html
-https://www.geeksforgeeks.org/curl-command-in-linux-with-examples/
-```
