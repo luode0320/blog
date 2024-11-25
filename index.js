@@ -1,3 +1,11 @@
+/*
+ * @Author: luode 1846555387@qq.com
+ * @Date: 2024-02-25 18:20:33
+ * @LastEditors: luode 1846555387@qq.com
+ * @LastEditTime: 2024-11-25 22:37:37
+ * @FilePath: \blog\index.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE   
+ */
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
@@ -35,10 +43,13 @@ function generateMarkdown(dir, indent = '') {
             markdown += `${indent}* **${file}**\n`;
             markdown = markdown + markdownSub
         } else {
-            if (!/\.md$/i.test(file)) {
+            // 只处理扩展名为 .md的文件, 并忽略包含 "(私密)" 字样的文件
+            if (!/\.md$/i.test(file) || /\(私密\)/.test(file)) {
                 return;
             }
+            // 计算当前文件相对于当前工作目录 (__dirname) 的相对路径。
             const relativePath = path.relative(__dirname, filePath);
+            // 计算当前文件相对于当前工作目录 (__dirname) 的相对路径。
             markdown += `${indent}* [${file}](${relativePath})\n`;
         }
     });
