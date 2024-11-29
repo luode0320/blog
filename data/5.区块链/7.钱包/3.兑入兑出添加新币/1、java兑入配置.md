@@ -1,27 +1,21 @@
+# 页面
+
 ![image-20241024150302335](../../../picture/image-20241024151910227.png)
 
 
-# 配置
+# 文件配置
 
 ![image-20241024150302335](../../../picture/image-20241024150302335.png)
 
 
 
-**补充新增主链TON流程实例**
-
-1. loadAvailableCoinsList:从文件csv,txt加载币种信息
-2. getPair:获取货币对信息
-3. getNewEthGasFee:获取新的Gas费用
-4. loadCurrencies:定时任务，定期加载货币信息
-5. findBaseCurrency:在货币映射中查找基础货币信息
-6. getCoinsAllowNew:获取允许的新币种信息
-7. createOrder:创建兑换订单的处理方法
-
 
 
 ## default_coins.csv
 
-excel表格添加币种, 这里是详细信息
+excel表格添加币种, 这里是详细信息:
+
+
 
 ![image-20241024150721404](../../../picture/image-20241024150721404.png)
 
@@ -33,16 +27,56 @@ excel表格添加币种, 这里是详细信息
 
 
 
-# 代码添加
+# 代币名称
+
+```java
+        if ("TON".equalsIgnoreCase(name) && "TON".equalsIgnoreCase(network)) {
+            return "TON";
+        }
+
+        // 有代币的主币都要加，我真是疯了
+        if (network.equalsIgnoreCase("BSC") ||
+                network.equalsIgnoreCase("HECO") ||
+                network.equalsIgnoreCase("AVAX") ||
+                network.equalsIgnoreCase("FTM") ||
+                network.equalsIgnoreCase("FLR") ||
+                network.equalsIgnoreCase("XVG") ||
+                network.equalsIgnoreCase("SOL") ||
+                network.equalsIgnoreCase("ARB") ||
+                network.equalsIgnoreCase("BASE") ||
+                network.equalsIgnoreCase("ETC") ||
+                network.equalsIgnoreCase("TON")) {
+            return StringUtil.buildString(name, "(", network, ")");
+        }
+```
+
+
 
 **![image-20241024151028001](../../../picture/image-20241024151028001.png)**
 
+
+
 # 前端显示
+
+```java
+        if (network.equalsIgnoreCase("FLR") && !name.equalsIgnoreCase("FLR")) {
+            return name + "(FLR)";
+        }
+        if (network.equalsIgnoreCase("TON") && !name.equalsIgnoreCase("TON")) {
+            return name + "(TON)";
+        }
+```
 
 ![image-20241025103941928](../../../picture/image-20241025103941928.png)
 
-# gas费获取配置
+
+
+# gas配置
 
 这里配置表示使用最新的go语言写的后台接口调用。
+
+```java
+    public static final List<String> NEW_ETH_SYSTEM_COINS = Arrays.asList("ETH","BASE","ARB","FLR","TON");
+```
 
 ![image-20241024151126041](../../../picture/image-20241024151126041.png)
