@@ -1,4 +1,4 @@
-# 汇率接口getMarketInfonew
+# 获取汇率和范围getMarketInfonew
 
 ```
 2024-10-24 14:00:26.603  INFO 875837 [http-nio-5011-exec-32] c.e.c.portal.interceptor.JwtInterceptor  : ===new request: [119.8.185.250] -> http://cloudtest.ellipal.com/api/getMarketInfonew
