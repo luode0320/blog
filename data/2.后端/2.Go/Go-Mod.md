@@ -81,3 +81,10 @@ go mod edit -go=1.20
 ```
 
 将 `go.mod` 文件中的 Go 版本修改为 1.20。
+
+### 9.调试工具
+
+```sh
+go install github.com/go-delve/delve/cmd/dlv@latest
+```
+
