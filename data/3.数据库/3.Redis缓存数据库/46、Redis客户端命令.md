@@ -2,6 +2,7 @@
 
 ```sh
 redis-cli -p 6379 GET "income_info_week:2022-28"
+redis-cli -p 6379 GET "EllipalNodeSync:ContractList" > ContractList.txt
 ```
 
 
