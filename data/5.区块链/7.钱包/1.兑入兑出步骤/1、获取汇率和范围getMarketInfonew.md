@@ -21,3 +21,31 @@
     }
 ```
 
+
+
+# range
+
+```java
+    @PostMapping(value = "/range")
+    public EAmountRange getRangeAmount(@RequestBody EPairRequest request) {
+```
+
+
+
+# 获取币价
+
+```java
+    @GetMapping(value = "getCoinUsdVal")
+    public String getCoinUsdVal(@RequestParam(name = "name") String name,
+                                @RequestParam(name = "fullName") String fullName,
+                                @RequestParam(name = "contractAddr") String contractAddr) {
+        try {
+            log.info("获取币种usd价格: name = {}, fullName = {}, contractAddr: {}", name, fullName, contractAddr);
+            return getCoinsValue(name, fullName, contractAddr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "0";
+    }
+```
+
