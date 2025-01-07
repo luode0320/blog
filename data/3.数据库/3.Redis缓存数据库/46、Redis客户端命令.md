@@ -4,6 +4,7 @@
 redis-cli -p 6379 GET "income_info_week:2022-28" | jq
 redis-cli -p 6379 GET "EllipalNodeSync:ContractList" > ContractList.txt | jq
 redis-cli -p 6379 GET "allcurrencyInfobuy" | jq
+redis-cli -p 6379 GET "income_info_date:2024-12-25" | jq
 ```
 
 
@@ -12,6 +13,7 @@ redis-cli -p 6379 GET "allcurrencyInfobuy" | jq
 
 ```sh
 redis-cli -p 6379 DEL "income_info_week:2022-28"
+redis-cli -p 6379 DEL "income_info_date:2024-12-25"
 ```
 
 
