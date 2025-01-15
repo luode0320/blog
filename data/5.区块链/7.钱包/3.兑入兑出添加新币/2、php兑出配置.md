@@ -110,6 +110,29 @@ if (count(explode("TON", $pairRshow))==2 || $pairRshow == "TON(TON)" || $pairRsh
 # 配置主币支持兑换的代币
 
 ```php
+                //是否支持兑换（全网、交易所）
+                ////兌換邏輯存在很多問題，只能進行重構解決，為臨時支持產品的需求。 故後面處理時現將支持的幣種直接寫死，至少要有一家渠道支持才寫（最好寫在支持渠道的業務邏輯裡面）
+                $chkCoinGlobal = Ordernew::chkCoinsOrder($v->shortName, $v->name, $cType, $v->contractAddr);
+                //奖励币
+                if (config('wallet.isAwardEx') == 1) {
+                    $awardExCoins = Order::getAwardExCoins(); //CCT兑换支持的币种，验证余额
+                    if (!empty($awardExCoins) && $v->contractAddr == config('wallet.awardCoinContractAddr')) {
+                        $chkCoinGlobal = 1;
+                    }
+                }
+                //判断swft独立支持兑换
+                if (!$chkCoinGlobal) {
+                    $chkCoinGlobal = Ordernewswiftonly::chkCoinsOrderswftOnly($v->shortName, $v->name, $cType, $v->contractAddr);
+                }
+                //判断changenow独立支持兑换
+                if (!$chkCoinGlobal) {
+                    $chkCoinGlobal = Ordernewchangenowonly::chkCoinsOrderchangenowOnly($v->shortName, $v->name, $cType, $v->contractAddr);
+                }
+```
+
+![image-20250115112834510](../../../picture/image-20250115112834510.png)
+
+```php
         // strtolowerAddr: 转换为小写形式
         if (strtolowerAddr($coinType) == strtolowerAddr("TON")) {
             // 使用了 in_array 函数来检查 $shortName 是否存在于数组["ton"]中

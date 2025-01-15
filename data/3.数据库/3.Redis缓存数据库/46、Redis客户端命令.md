@@ -7,8 +7,9 @@ redis-cli -p 6379 GET "allcurrencyInfobuy" | jq
 redis-cli -p 6379 GET "income_info_date:2024-12-25" | jq
 redis-cli -p 6379 GET "income_info_week:2022-28" 
 redis-cli -p 6379 GET "income_info_date" 
-redis-cli -p 6379 GET "EllipalNodeSync:ContractList" > ContractList.txt 
+redis-cli -p 6379 GET "EllipalNodeSync:ContractList" > ContractList.txt  
 redis-cli -p 6379 GET "token_prices_redis_key"  > prices.txt 
+redis-cli -p 6379 GET "CoinsAllowOrderCYnewChangenowOnly" # 获取swif兑换支持的币种 单向支持
 ```
 
 
