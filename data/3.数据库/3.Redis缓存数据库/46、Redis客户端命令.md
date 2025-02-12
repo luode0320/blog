@@ -44,3 +44,18 @@ redis-cli -p 6379 KEYS "income_info_week:*"
 redis-cli -p 6379 SET allcurrencyInfobuy "<modified JSON>"
 ```
 
+
+
+# 检测redis是否启动
+
+```sh
+# 1
+service redis status
+# 2
+systemctl status redis
+# 3
+ps aux | grep redis-server
+[root@ecs-wallet-test ~]# ps aux | grep redis-server
+root      9115  0.0  0.0  69756  8320 ?        Sl   11:10   0:00 redis-server 127.0.0.1:6379
+```
+
