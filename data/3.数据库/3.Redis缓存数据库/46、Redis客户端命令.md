@@ -9,7 +9,9 @@ redis-cli -p 6379 GET "income_info_week:2022-28"
 redis-cli -p 6379 GET "income_info_date" 
 redis-cli -p 6379 GET "EllipalNodeSync:ContractList" > ContractList.txt  
 redis-cli -p 6379 GET "token_prices_redis_key"  > prices.txt 
-redis-cli -p 6379 GET "CoinsAllowOrderCYnewChangenowOnly" # 获取swif兑换支持的币种 单向支持
+redis-cli -p 6379 GET "CoinsAllowOrderCYnewChangenowOnly" # 获取swif兑换支持的币种 单向支持 
+redis-cli -p 6379 GET "pricerate" # 获取法币汇率 satebyteEvalFeesFivedays:
+redis-cli -p 6379 GET "satebyteEvalFeesFivedays:BTC" # 最忌5个区块的平均 sat 
 ```
 
 
@@ -42,6 +44,7 @@ redis-cli -p 6379 KEYS "income_info_week:*"
 
 ```sh
 redis-cli -p 6379 SET allcurrencyInfobuy "<modified JSON>"
+redis-cli -p 6379 GET "satebyteEvalFeesFivedays:BTC" # 重新设置btc的gas
 ```
 
 

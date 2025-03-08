@@ -109,7 +109,7 @@ if (count(explode("TON", $pairRshow))==2 || $pairRshow == "TON(TON)" || $pairRsh
 
 # 配置主币支持兑换的代币
 
-getBalanceV4
+getBalanceV4: 这里是入口
 
 ```php
                 //是否支持兑换（全网、交易所）
