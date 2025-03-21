@@ -11,7 +11,8 @@ redis-cli -p 6379 GET "EllipalNodeSync:ContractList" > ContractList.txt
 redis-cli -p 6379 GET "token_prices_redis_key"  > prices.txt 
 redis-cli -p 6379 GET "CoinsAllowOrderCYnewChangenowOnly" # 获取swif兑换支持的币种 单向支持 
 redis-cli -p 6379 GET "pricerate" # 获取法币汇率 satebyteEvalFeesFivedays:
-redis-cli -p 6379 GET "satebyteEvalFeesFivedays:BTC" # 最忌5个区块的平均 sat 
+redis-cli -p 6379 GET "satebyteEvalFeesFivedays:BTC" # 最忌5个区块的平均 sat  CoinsAllowOrder
+redis-cli -p 6379 GET "CoinsAllowOrder" # 获取币种Logo
 ```
 
 
