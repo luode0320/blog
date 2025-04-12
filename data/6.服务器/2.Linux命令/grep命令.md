@@ -150,3 +150,12 @@ https://www.tutorialspoint.com/unix_commands/grep.htm
 https://www.geeksforgeeks.org/fold-command-in-linux-with-examples/
 ```
 
+
+
+# 常用命令
+
+```
+# 查询nginx域名配置所在文件位置
+grep -r "server_name admintest.ellipal.com" /usr/local/nginx/conf/
+```
+

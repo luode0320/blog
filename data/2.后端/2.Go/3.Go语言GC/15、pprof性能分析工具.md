@@ -111,20 +111,102 @@ o/options:	列出选项及其当前值。
 q/quit/exit/^D:退出 pprof。
 ```
 
-## `top`: 查看前10条, 内存倒序![image-20240807013255841](../../../picture/image-20240807013255841.png)
+## `top`: 查看前10条, 内存倒序
 
-- **flat**: 函数自身允许资源消耗
-- **flat%**: 消耗百分比
-- **Sum%**: 资源消耗总和
-- **Cum**: 当前函数加上它所有调用栈允许总消耗
-- **Cum%**: 消耗百分比
-- **堆栈**
+反映运行过程中分配的内存，不是当前占用
+
+![image-20240807013255841](../../../picture/image-20240807013255841.png)
+
+flat：该函数直接分配的内存。
+
+flat%：该函数直接分配的内存占总内存的百分比。
+
+sum%：从顶部累加到当前行的内存百分比。
+
+cum：该函数及其调用链（包括子函数）总共分配的内存。
+
+cum%：累计内存占总内存的百分比。
+
+函数名：内存分配的来源。
+
+
+
+## `cpu`: 分析
+
+```sh
+# 采集30s
+go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
+
+# 打开
+go tool pprof cpu.prof
+
+# 分析
+top 10
+```
+
+```
+(pprof) top 10 
+Showing nodes accounting for 5990ms, 58.16% of 10300ms total
+Dropped 82 nodes (cum <= 51.50ms)
+Showing top 10 nodes out of 60
+      flat  flat%   sum%        cum   cum%
+    2090ms 20.29% 20.29%     2090ms 20.29%  runtime.stdcall6
+     830ms  8.06% 28.35%     3990ms 38.74%  runtime.stealWork
+     660ms  6.41% 34.76%      660ms  6.41%  runtime.stdcall1
+     550ms  5.34% 40.10%      550ms  5.34%  runtime.(*randomEnum).next
+     410ms  3.98% 44.08%     2640ms 25.63%  runtime.runtimer
+     370ms  3.59% 47.67%      370ms  3.59%  runtime.(*randomOrder).start
+     320ms  3.11% 50.78%      320ms  3.11%  runtime.pMask.read
+     310ms  3.01% 53.79%     3240ms 31.46%  runtime.checkTimers
+     250ms  2.43% 56.21%      950ms  9.22%  runtime.send
+     200ms  1.94% 58.16%      210ms  2.04%  time.Now
+```
+
+
+
+## `内存`: 分析
+
+```sh
+# 采集 -sample_index=alloc_space 表示分析累计分配的内存（默认是当前占用 inuse_space）
+go tool pprof -sample_index=inuse_space http://localhost:6060/debug/pprof/heap
+
+# 打开
+go tool pprof heap.prof
+# 累计分配内存（包括已释放的）
+go tool pprof -sample_index=alloc_space heap.prof
+# 当前占用内存（未被 GC 释放的）
+go tool pprof -sample_index=inuse_space heap.prof
+```
+
+```sh
+(pprof) top 10
+Showing nodes accounting for 332.63MB, 96.18% of 345.86MB total
+Dropped 100 nodes (cum <= 1.73MB)
+Showing top 10 nodes out of 50
+      flat  flat%   sum%        cum   cum%
+   82.08MB 23.73% 23.73%   159.19MB 46.03%  ellipal_finance/app/exchange/provider/changenow.(*exchangeProvider).UpdatePairsTask
+   61.11MB 17.67% 41.40%    61.11MB 17.67%  reflect.growslice
+      51MB 14.75% 56.15%       51MB 14.75%  encoding/json.(*decodeState).literalStore
+   40.51MB 11.71% 67.86%    40.51MB 11.71%  reflect.New
+   33.04MB  9.55% 77.41%    33.04MB  9.55%  bytes.growSlice
+   32.89MB  9.51% 86.92%    32.89MB  9.51%  ellipal_finance/app/exchange/service.(*ExchangeService).mergeMaps
+   22.56MB  6.52% 93.45%    55.08MB 15.93%  ellipal_finance/app/exchange/provider/changelly.(*exchangeProvider).UpdatePairsTask
+       4MB  1.16% 94.60%        4MB  1.16%  ellipal_finance/app/exchange/provider/changenow.GenChangeNowExchangeKey
+    2.93MB  0.85% 95.45%     3.93MB  1.14%  ellipal_finance/app/exchange/service.(*ExchangeService).SavePriceFromProvider
+    2.51MB  0.73% 96.18%     2.51MB  0.73%  ellipal_finance/app/exchange/provider/swft.(*exchangeProvider).UpdatePairsTask
+```
+
+
 
 ### `gc`: 分析gc暂停时间
+
+
 
 ## `list`: 看指定源代码内存占用
 
 ![image-20240807013608774](../../../picture/image-20240807013608774.png)
+
+
 
 ## `web`: 下载svg
 

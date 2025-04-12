@@ -88,3 +88,15 @@ go mod edit -go=1.20
 go install github.com/go-delve/delve/cmd/dlv@latest
 ```
 
+### 10.编译
+
+```
+go build -o heiheihei.exe
+```
+
+### 11.运行
+
+```
+go run main.go
+```
+
