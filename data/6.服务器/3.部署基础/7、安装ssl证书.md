@@ -140,10 +140,16 @@ acme.sh --issue --dns dns_ali -d *.luode.vip
 
 ```sh
 mkdir -p /usr/local/src/nginx/ssl
+# 二进制nginx
 acme.sh --installcert -d '*.luode.vip' \
 --key-file /usr/local/src/nginx/ssl/luode.vip.key  \
 --fullchain-file /usr/local/src/nginx/ssl/luode.vip.pem \
 --reloadcmd "systemctl restart nginx"
+# docker nginx
+acme.sh --installcert -d '*.luode.vip' \
+--key-file /usr/local/src/nginx/ssl/luode.vip.key  \
+--fullchain-file /usr/local/src/nginx/ssl/luode.vip.pem \
+--reloadcmd "docker restart nginx"
 ```
 
 上面提到的申请和安装命令，执行过一次后，`acme.sh`便会记下你的操作，在证书即将到期前`cron job`会自动帮你执行一遍，非常的好用和贴心。
