@@ -13,6 +13,9 @@ redis-cli -p 6379 GET "CoinsAllowOrderCYnewChangenowOnly" # 获取swif兑换支�
 redis-cli -p 6379 GET "pricerate" # 获取法币汇率 satebyteEvalFeesFivedays:
 redis-cli -p 6379 GET "satebyteEvalFeesFivedays:BTC" # 最忌5个区块的平均 sat  CoinsAllowOrder
 redis-cli -p 6379 GET "CoinsAllowOrder" # 获取币种Logo
+
+redis-cli -p 6379 --scan --pattern "XRP-trustLines:*" | head -10 | xargs -I {} redis-cli -p 6379 GET {}  # 查询10条某前缀的key
+
 ```
 
 

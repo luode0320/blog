@@ -6,6 +6,11 @@
 
 ```shell
 yum install -y yum-utils device-mapper-persistent-data lvm2
+
+# Ubuntu 
+apt update
+apt install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 ```
 
 ### 配置docker下载的yum源
@@ -13,6 +18,9 @@ yum install -y yum-utils device-mapper-persistent-data lvm2
 ```shell
 yum -y install wget
 wget -P /etc/yum.repos.d/ https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+# Ubuntu 
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
 ### 查看yum源仓库支持的版本
@@ -35,6 +43,12 @@ rm -rf /var/lib/docker/network/*
 
 # 安装
 yum -y install docker-ce-24.0.6-1.el7  docker-ce-cli-24.0.6-1.el7
+```
+
+```sh
+# Ubuntu 
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 
 ### 查询
