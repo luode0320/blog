@@ -1,36 +1,26 @@
 # centos安装
 
-## 使用阿里源下载新版本
-
-### 安装需要的软件驱动
+安装需要的软件驱动
 
 ```shell
 yum install -y yum-utils device-mapper-persistent-data lvm2
-
-# Ubuntu 
-apt update
-apt install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 ```
 
-### 配置docker下载的yum源
+配置docker下载的yum源
 
 ```shell
 yum -y install wget
 wget -P /etc/yum.repos.d/ https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-
-# Ubuntu 
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
-### 查看yum源仓库支持的版本
+查看yum源仓库支持的版本
 
 ```shell
 [root@rod ~]# yum list docker-ce --showduplicates | sort -r
 docker-ce.x86_64            3:24.0.6-1.el7                      docker-ce-stable
 ```
 
-### 安装
+安装
 
 ```shell
 # 卸载旧版本
@@ -45,17 +35,41 @@ rm -rf /var/lib/docker/network/*
 yum -y install docker-ce-24.0.6-1.el7  docker-ce-cli-24.0.6-1.el7
 ```
 
+
+
+# Ubuntu安装
+
+安装需要的软件驱动
+
 ```sh
-# Ubuntu 
-apt-get update
-apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+apt update
+apt-get install -y ca-certificates curl gnupg lsb-release
+apt install -y apt-transport-https ca-certificates curl software-properties-common
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 ```
+
+配置docker下载的源
+
+```sh
+# 添加 Docker 官方 APT 源（自动匹配系统版本）
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+安装
+
+```sh
+apt-get update
+apt-get install -y containerd
+apt-get install -y docker-ce docker-ce-cli docker-compose-plugin
+```
+
+
 
 ### 查询
 
 ```shell
 docker -v
-#Docker version 24.0.6, build ed223bc
 ```
 
 ### 安装docker-compose
@@ -88,7 +102,31 @@ cd /etc/docker
 ```sh
 sudo tee /etc/docker/daemon.json <<-'EOF'
 {
-    "registry-mirrors": ["https://dockerproxy.cn","https://docker.rainbond.cc","https://docker.udayun.com","https://docker.211678.top"]
+    "registry-mirrors": [
+        "https://docker.registry.cyou",
+        "https://docker-cf.registry.cyou",
+        "https://dockercf.jsdelivr.fyi",
+        "https://docker.jsdelivr.fyi",
+        "https://dockertest.jsdelivr.fyi",
+        "https://mirror.aliyuncs.com",
+        "https://dockerproxy.com",
+        "https://mirror.baidubce.com",
+        "https://docker.m.daocloud.io",
+        "https://docker.nju.edu.cn",
+        "https://docker.mirrors.sjtug.sjtu.edu.cn",
+        "https://docker.mirrors.ustc.edu.cn",
+        "https://mirror.iscas.ac.cn",
+        "https://docker.rainbond.cc",
+        "https://do.nark.eu.org",
+        "https://dc.j8.work",
+        "https://dockerproxy.com",
+        "https://gst6rzl9.mirror.aliyuncs.com",
+        "https://registry.docker-cn.com",
+        "http://hub-mirror.c.163.com",
+        "http://mirrors.ustc.edu.cn/",
+        "https://mirrors.tuna.tsinghua.edu.cn/",
+        "http://mirrors.sohu.com/"
+    ]
 }
 EOF
 ```

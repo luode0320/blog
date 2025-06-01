@@ -12,10 +12,6 @@ cd /usr/local/src/nginx
 # docker 安装nginx
 
 ```sh
-docker pull luode0320/nginx:latest
-```
-
-```sh
 # 创建挂载目录
 mkdir -p /usr/local/src/nginx/conf
 mkdir -p /usr/local/src/nginx/log
