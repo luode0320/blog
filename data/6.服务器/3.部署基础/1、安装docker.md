@@ -23,14 +23,6 @@ docker-ce.x86_64            3:24.0.6-1.el7                      docker-ce-stable
 安装
 
 ```shell
-# 卸载旧版本
-yum remove -y docker-ce docker-ce-cli containerd.io
-
-# 彻底清理残留
-rm -rf /var/lib/docker /etc/docker /var/run/docker.sock
-# 清除所有Docker网络配置
-rm -rf /var/lib/docker/network/*
-
 # 安装
 yum -y install docker-ce-24.0.6-1.el7  docker-ce-cli-24.0.6-1.el7
 ```
@@ -45,14 +37,13 @@ yum -y install docker-ce-24.0.6-1.el7  docker-ce-cli-24.0.6-1.el7
 apt update
 apt-get install -y ca-certificates curl gnupg lsb-release
 apt install -y apt-transport-https ca-certificates curl software-properties-common
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 ```
 
 配置docker下载的源
 
 ```sh
-# 添加 Docker 官方 APT 源（自动匹配系统版本）
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
@@ -70,6 +61,12 @@ apt-get install -y docker-ce docker-ce-cli docker-compose-plugin
 
 ```shell
 docker -v
+#加载docker配置
+#启动docker服务
+#设置docker服务开机自启
+systemctl daemon-reload
+systemctl start docker
+systemctl enable docker
 ```
 
 ### 安装docker-compose
@@ -131,15 +128,9 @@ sudo tee /etc/docker/daemon.json <<-'EOF'
 EOF
 ```
 
-### 设置docker服务开机启动
-
 ```sh
-#加载docker配置
-#启动docker服务
-#设置docker服务开机自启
 systemctl daemon-reload
-systemctl start docker
-systemctl enable docker
+systemctl restart docker
 ```
 
 # 登录
