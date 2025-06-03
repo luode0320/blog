@@ -92,6 +92,8 @@ curl -x http://127.0.0.1:7897  -s https://api.binance.com/api/v3/exchangeInfo
 echo -e '\n# Set Proxy\nexport http_proxy="http://127.0.0.1:7897"\nexport https_proxy="http://127.0.0.1:7897"\nexport all_proxy="socks5://127.0.0.1:7897"' >> ~/.bashrc && source ~/.bashrc
 # 2. [可选]内网服务器全局永久配置(192.10.10.44)
 echo -e '\n# Set Proxy\nexport http_proxy="http://192.10.10.19:7897"\nexport https_proxy="http://192.10.10.19:7897"\nexport all_proxy="socks5://192.10.10.19:7897"' >> ~/.bashrc && source ~/.bashrc
+# 3. [可选]外网服务器全局永久配置(192.10.10.44)
+echo -e '\n# Set Proxy\nexport http_proxy="http://10.10.10.10:7897"\nexport https_proxy="http://10.10.10.10:7897"\nexport all_proxy="socks5://10.10.10.10:7897"' >> ~/.bashrc && source ~/.bashrc
 # 3. 取消配置
 # echo -e '\n# Set Proxy\nexport http_proxy=\nexport https_proxy=\nexport all_proxy=' >> ~/.bashrc && source ~/.bashrc
 
