@@ -49,6 +49,9 @@ proxy-groups:
       - REJECT
 
 rules:
+  - IP-CIDR,192.168.0.0/16,Direct
+  - IP-CIDR,10.0.0.0/8,Direct
+  - IP-CIDR,172.16.0.0/12,Direct
   - GEOIP,CN,Direct
   - GEOIP,US,Proxy
   - MATCH,Proxy
