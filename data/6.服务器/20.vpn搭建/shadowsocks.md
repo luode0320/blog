@@ -1,11 +1,3 @@
-
-
-```sh
-hy2 vpn服务
-```
-
-
-
 #  启动vpn服务端
 
 ```sh
@@ -17,7 +9,7 @@ docker run -d \
   -e SERVER_ADDR=0.0.0.0 \
   -e SERVER_PORT=8388 \
   -e PASSWORD=Ld@588588 \
-  -e METHOD=aes-256-gcm \
+  -e METHOD=aes-128-gcm \
   luode0320/shadowsocks
 ```
 
@@ -28,7 +20,7 @@ docker run -d \
 firewall-cmd --permanent --add-port=8388/tcp
 firewall-cmd --reload
 
-# ubuntu
+# 允许8388/tcp端口（Ubuntu）
 ufw allow 8388/tcp
 ```
 
@@ -51,7 +43,7 @@ proxies:
     port: 8388
     type: ss
     password: Ld@588588
-    cipher: aes-256-gcm
+    cipher: aes-128-gcm
 
 proxy-groups:
   - name: Proxy
@@ -79,7 +71,7 @@ rules:
 
 
 
-## 配置订阅
+## 配置订阅:
 
 1. 点击左侧订阅
 2. 右上角新建
