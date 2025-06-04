@@ -47,7 +47,10 @@ proxies:
 
 proxy-groups:
   - name: Proxy
-    type: select
+    type: url-test      # 自动选择延迟最低的可用节点
+    url: http://www.gstatic.com/generate_204
+    interval: 10      # 每10s测试一次
+    tolerance: 50      # 延迟相差50ms以内不切换
     proxies:
       - test
   - name: Direct
