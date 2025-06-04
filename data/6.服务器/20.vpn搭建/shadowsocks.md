@@ -1,15 +1,34 @@
 #  启动vpn服务端
 
 ```sh
+# pc端
 docker run -d \
   --restart=always \
-  --name shadowsocks \
+  --name shadowsocks-pc \
+  --cap-add=NET_ADMIN \
   -p 8388:8388/tcp \
   -p 8388:8388/udp \
   -e SERVER_ADDR=0.0.0.0 \
   -e SERVER_PORT=8388 \
   -e PASSWORD=Ld@588588 \
-  -e METHOD=aes-128-gcm \
+  -e METHOD=aes-256-gcm \
+  -e FAST_OPEN=true \
+  -e ARGS=--fast-open \
+  luode0320/shadowsocks
+  
+# 移动端
+docker run -d \
+  --restart=always \
+  --name shadowsocks-mobile \
+  --cap-add=NET_ADMIN \
+  -p 8399:8388/tcp \
+  -p 8399:8388/udp \
+  -e SERVER_ADDR=0.0.0.0 \
+  -e SERVER_PORT=8388 \
+  -e PASSWORD=Ld@588588 \
+  -e METHOD=xchacha20-ietf-poly1305 \
+  -e FAST_OPEN=true \
+  -e ARGS=--fast-open \
   luode0320/shadowsocks
 ```
 
@@ -38,12 +57,18 @@ https://www.ilanzou.com/s/JcG0BWV9
 
 ```yaml
 proxies:
-  - name: test
+  - name: shadowsocks-pc
     server: 111.111.111.111
     port: 8388
     type: ss
     password: Ld@588588
-    cipher: aes-128-gcm
+    cipher: aes-256-gcm
+  - name: shadowsocks-mobile
+    server: 111.111.111.111
+    port: 8388
+    type: ss
+    password: Ld@588588
+    cipher: xchacha20-ietf-poly1305
 
 proxy-groups:
   - name: Proxy
@@ -52,7 +77,8 @@ proxy-groups:
     interval: 10      # 每10s测试一次
     tolerance: 50      # 延迟相差50ms以内不切换
     proxies:
-      - test
+      - shadowsocks-pc
+      - shadowsocks-mobile
   - name: Direct
     type: select
     proxies:
