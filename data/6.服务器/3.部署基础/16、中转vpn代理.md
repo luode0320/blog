@@ -52,11 +52,78 @@ proxy-groups:
       - REJECT
 
 rules:
+  # ======== 基础规则 ========
   - IP-CIDR,192.168.0.0/16,Direct
   - IP-CIDR,10.0.0.0/8,Direct
   - IP-CIDR,172.16.0.0/12,Direct
   - GEOIP,CN,Direct
-  - GEOIP,US,Proxy
+  
+  # ======== 国内域名后缀直连 ========
+  - DOMAIN-SUFFIX,cn,DIRECT
+  - DOMAIN-SUFFIX,com.cn,DIRECT
+  - DOMAIN-SUFFIX,gov.cn,DIRECT
+  - DOMAIN-SUFFIX,edu.cn,DIRECT
+  - DOMAIN-SUFFIX,net.cn,DIRECT
+  - DOMAIN-SUFFIX,org.cn,DIRECT
+
+  # ======== 你提供的域名规则（已分类） ========
+  ## 百度系
+  - DOMAIN-SUFFIX,baidu.com,DIRECT
+  - DOMAIN-SUFFIX,baidubcr.com,DIRECT
+  - DOMAIN-SUFFIX,bdstatic.com,DIRECT
+  - DOMAIN-SUFFIX,yunjiasu-cdn.net,DIRECT
+
+  ## 阿里系
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,alicdn.com,DIRECT
+  - DOMAIN-SUFFIX,alibaba.com,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,aliyun.com,DIRECT
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+
+  ## 腾讯系
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,tencent.com,DIRECT
+  - DOMAIN-SUFFIX,tenpay.com,DIRECT
+  - DOMAIN-SUFFIX,qcloud.com,DIRECT
+  - DOMAIN-SUFFIX,gtimg.com,DIRECT
+
+  ## 网易系
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,126.net,DIRECT
+  - DOMAIN-SUFFIX,netease.com,DIRECT
+  - DOMAIN-SUFFIX,ydstatic.com,DIRECT
+
+  ## 字节跳动（抖音/头条）
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,ixigua.com,DIRECT
+  - DOMAIN-SUFFIX,toutiao.com,DIRECT
+  - DOMAIN-SUFFIX,pstatp.com,DIRECT
+
+  ## 常用服务
+  - DOMAIN-SUFFIX,jd.com,DIRECT       # 京东
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT # B站
+  - DOMAIN-SUFFIX,zhihu.com,DIRECT    # 知乎
+  - DOMAIN-SUFFIX,weibo.com,DIRECT    # 微博
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT   # 小米
+  - DOMAIN-SUFFIX,meituan.com,DIRECT  # 美团
+  - DOMAIN-SUFFIX,didiglobal.com,DIRECT # 滴滴
+
+  ## 其他高频域名（从你的列表中精选）
+  - DOMAIN-SUFFIX,acgvideo.com,DIRECT
+  - DOMAIN-SUFFIX,douban.com,DIRECT
+  - DOMAIN-SUFFIX,iqiyi.com,DIRECT
+  - DOMAIN-SUFFIX,youku.com,DIRECT
+  - DOMAIN-SUFFIX,ximalaya.com,DIRECT
+  - DOMAIN-SUFFIX,smzdm.com,DIRECT
+  - DOMAIN-SUFFIX,sspai.com,DIRECT
+  - DOMAIN-SUFFIX,tianyancha.com,DIRECT
+  - DOMAIN-SUFFIX,xiachufang.com,DIRECT
+  - DOMAIN-SUFFIX,zimuzu.tv,DIRECT
+  
+  # ======== 最终兜底规则 ========
   - MATCH,Proxy
 EOF
 ```
