@@ -6,8 +6,8 @@ docker run -d \
   --restart=always \
   --name shadowsocks-pc \
   --cap-add=NET_ADMIN \
-  -p 8388:8388/tcp \
-  -p 8388:8388/udp \
+  -p 8300:8388/tcp \
+  -p 8300:8388/udp \
   -e SERVER_ADDR=0.0.0.0 \
   -e SERVER_PORT=8388 \
   -e PASSWORD=Ld@588588 \
@@ -59,13 +59,13 @@ https://www.ilanzou.com/s/JcG0BWV9
 proxies:
   - name: shadowsocks-pc
     server: 111.111.111.111
-    port: 8388
+    port: 8300
     type: ss
     password: Ld@588588
     cipher: aes-256-gcm
   - name: shadowsocks-mobile
     server: 111.111.111.111
-    port: 8388
+    port: 8399
     type: ss
     password: Ld@588588
     cipher: xchacha20-ietf-poly1305

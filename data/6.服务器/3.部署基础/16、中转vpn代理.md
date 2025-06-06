@@ -4,12 +4,12 @@
 docker run -d \
   --restart=always \
   --name shadowsocks \
-  -p 8388:8388/tcp \
-  -p 8388:8388/udp \
+  -p 8300:8388/tcp \
+  -p 8300:8388/udp \
   -e SERVER_ADDR=0.0.0.0 \
   -e SERVER_PORT=8388 \
   -e PASSWORD=Ld@588588 \
-  -e METHOD=aes-128-gcm \
+  -e METHOD=aes-256-gcm \
   luode0320/shadowsocks
 ```
 
@@ -28,10 +28,10 @@ log-level: info
 proxies:
   - name: vpn
     server: 10.10.10.10 # 香港服务器ip
-    port: 8388 # 香港服务器端口
+    port: 8300 # 香港服务器端口
     type: ss
     password: Ld@588588 # 香港服务器vpn密码
-    cipher: aes-128-gcm # 香港服务器vpn加密算法
+    cipher: aes-256-gcm # 香港服务器vpn加密算法
     udp: true  # 允许 UDP 流量
 
 proxy-groups:
