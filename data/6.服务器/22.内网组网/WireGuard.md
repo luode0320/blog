@@ -47,23 +47,6 @@ EOF
 PublicKey = <上海服务器的publickey>
 AllowedIPs = 10.0.0.3/32
 EOF
-
-tee /etc/wireguard/wg0.conf <<-'EOF'
-[Interface]
-Address = 10.0.0.1/24
-PrivateKey = SG+3Lo7QHGylWRRptP5Yv7NnMw2QHWn9mkLlxcZ1u3M=
-ListenPort = 8333
-PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
-
-[Peer]
-PublicKey = YwMXf+GI8VbhxSpYIN9rm1PZqqXlHt3SdTY16VJlwSU=
-AllowedIPs = 10.0.0.2/32
-
-[Peer]
-PublicKey = BTeVLVnAktHKH45cM5OGoOYXF1JiL3AOts1ITPbl0kU=
-AllowedIPs = 10.0.0.3/32
-EOF
 ```
 
 ```sh
@@ -89,19 +72,6 @@ AllowedIPs = 10.0.0.0/24
 Endpoint = 香港服务器公网IP:8333
 PersistentKeepalive = 25
 EOF
-
-
-tee /etc/wireguard/wg0.conf <<-'EOF'
-[Interface]
-Address = 10.0.0.2/24
-PrivateKey = OP0g4B+IcTvU2OwnMpn5osV/jC/uCuSfUgWES8W3+Uk=
-
-[Peer]
-PublicKey = O5Z+rPXQztZyMCKecF6wIQbZlIV8xYbaPneqZXAH+wU=
-AllowedIPs = 10.0.0.0/24
-Endpoint = 192.238.204.29:8333
-PersistentKeepalive = 25
-EOF
 ```
 
 ```sh
@@ -115,19 +85,6 @@ PrivateKey = <上海服务器的privatekey>
 PublicKey = <香港服务器的publickey>
 AllowedIPs = 10.0.0.0/24
 Endpoint = 香港服务器公网IP:8333
-PersistentKeepalive = 25
-EOF
-
-
-tee /etc/wireguard/wg0.conf <<-'EOF'
-[Interface]
-Address = 10.0.0.3/24
-PrivateKey = gGyUkEMngi4OvFrtaM9QWUGq1NrOadEF6JyJKC+RdUk=
-
-[Peer]
-PublicKey = O5Z+rPXQztZyMCKecF6wIQbZlIV8xYbaPneqZXAH+wU=
-AllowedIPs = 10.0.0.0/24
-Endpoint = 192.238.204.29:8333
 PersistentKeepalive = 25
 EOF
 ```
