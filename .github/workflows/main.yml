@@ -33,10 +33,10 @@ jobs:
       - name: 登录服务器, 执行脚本 # 描述词, 无实际意义
         uses: appleboy/ssh-action@master # 通过SSH登录到远程服务器
         with: # 配置actions/setup-node@v1的一些属性
-          host: ${{ secrets.REMOTE_HOST }}
+          host: 218.11.1.44
           username: root
           password: ${{ secrets.REMOTE_PASSWORD }}
-          port: 22 # 公网22端口
+          port: 10739 # 公网22端口
           script:
             | # 远程服务器依次执行下面的命令, 删除容器, 删除镜像, 拉取最新镜像, 启动blog容器
             docker rm -f blog
