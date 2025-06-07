@@ -5,7 +5,7 @@
 
 欧皇小德子的个人博客。
 
-[导航页](https://luode.vip) / [QQ群 542544997]()
+[导航页](https://www.luode.vip) / [QQ群 542544997]()
 
 
 ![index](./Static/png/index.png)
