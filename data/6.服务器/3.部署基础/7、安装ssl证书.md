@@ -4,23 +4,11 @@
 
 # 简介
 
-[acme.sh](https://github.com/acmesh-official/acme.sh) 是一个开源的 ACME 协议的客户端工具，用于自动化申请、更新和部署
-SSL/TLS 证书。
+[acme.sh](https://github.com/acmesh-official/acme.sh) 是一个开源的 ACME 协议的客户端工具，用于自动化申请、更新和部署SSL/TLS 证书。
 
 通过使用 acme.sh，用户可以轻松地在服务器上设置 HTTPS 加密连接，而无需手动操作。
 
-它支持多种 DNS 接口和证书颁发机构，可以与各种 Web 服务器和 DNS 服务集成，提供了方便的命令行工具和丰富的功能选项。
 
-目前 acme.sh 支持 5 个正式环境 CA，分别是 Let’s Encrypt、Buypass、ZeroSSL、SSL.com 和 Google Public CA，默认使用 ZeroSSL。
-
-# 主要步骤
-
-1. 安装 **acme.sh**脚本
-2. 自动创建每天执行的检测更新任务
-3. 开启自动更新脚本
-4. 配置DNS API
-5. 生成证书
-6. 安装证书到nginx
 
 # 安装 **acme.sh**
 
@@ -29,59 +17,20 @@ cd ~
 curl https://get.acme.sh | sh -s email=1846555387@qq.com
 ```
 
-```sh
-[root@luode ~]# curl https://get.acme.sh | sh -s email=1846555387@qq.com
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100  1032    0  1032    0     0   3878      0 --:--:-- --:--:-- --:--:--  3879
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100  218k  100  218k    0     0   289k      0 --:--:-- --:--:-- --:--:--  289k
-[Thu May 16 20:24:47 CST 2024] Installing from online archive.
-[Thu May 16 20:24:47 CST 2024] Downloading https://github.com/acmesh-official/acme.sh/archive/master.tar.gz
-[Thu May 16 20:24:49 CST 2024] Extracting master.tar.gz
-[Thu May 16 20:24:49 CST 2024] Installing to /root/.acme.sh
-[Thu May 16 20:24:49 CST 2024] Installed to /root/.acme.sh/acme.sh
-[Thu May 16 20:24:49 CST 2024] Installing alias to '/root/.bashrc'
-[Thu May 16 20:24:49 CST 2024] OK, Close and reopen your terminal to start using acme.sh
-[Thu May 16 20:24:49 CST 2024] Installing alias to '/root/.cshrc'
-[Thu May 16 20:24:49 CST 2024] Installing alias to '/root/.tcshrc'
-[Thu May 16 20:24:49 CST 2024] Installing cron job
-51 0 * * * "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" > /dev/null
-[Thu May 16 20:24:49 CST 2024] Good, bash is found, so change the shebang to use bash as preferred.
-[Thu May 16 20:24:50 CST 2024] OK
-[Thu May 16 20:24:50 CST 2024] Install success!
-```
-
-> 流程说明
-
 - 把 acme.sh 安装到你的 **home** 目录下 `/root/.acme.sh`
 - 自动为你创建 `cron job`, 每天 0:00 点自动检测所有的证书, 如果快过期了, 则会自动更新证书
 
-启用别名
-
-```
+```sh
+# 启用别名
 source ~/.bashrc
-```
-
-查看版本
-
-```sh
+# 查看版本
 acme.sh -v
-```
 
-```sh
-https://github.com/acmesh-official/acme.sh
-v3.0.7
-```
-
-# 开启自动更新
-
-只是自动更新脚本, 自动更新证书由`cron job`定时任务控制
-
-```sh
+# 开启自动更新脚本
 acme.sh --upgrade --auto-upgrade
 ```
+
+
 
 # 配置DNS API
 
@@ -130,6 +79,8 @@ acme.sh --issue --dns dns_ali -d *.luode.vip
 
 到此位置, 证书就生成成功了
 
+
+
 # 安装证书
 
 脚本命令将证书安装拷到我们自动的nginx证书配置目录下，并重新加载 Nginx 配置
@@ -140,11 +91,13 @@ acme.sh --issue --dns dns_ali -d *.luode.vip
 
 ```sh
 mkdir -p /usr/local/src/nginx/ssl
+
 # 二进制nginx
 acme.sh --installcert -d '*.luode.vip' \
---key-file /usr/local/src/nginx/ssl/luode.vip.key  \
---fullchain-file /usr/local/src/nginx/ssl/luode.vip.pem \
+--key-file /etc/nginx/ssl/luode.vip.key  \
+--fullchain-file /etc/nginx/ssl/luode.vip.pem \
 --reloadcmd "systemctl restart nginx"
+
 # docker nginx
 acme.sh --installcert -d '*.luode.vip' \
 --key-file /usr/local/src/nginx/ssl/luode.vip.key  \

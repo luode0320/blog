@@ -27,7 +27,7 @@ log-level: info
 
 proxies:
   - name: vpn
-    server: 10.10.10.10 # 香港服务器ip
+    server: 192.238.204.29 # 香港服务器ip
     port: 8300 # 香港服务器端口
     type: ss
     password: Ld@588588 # 香港服务器vpn密码
