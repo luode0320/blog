@@ -67,14 +67,15 @@ export Ali_Secret="AccessKey Secret"
 # 生成证书
 
 ```sh
-acme.sh --issue --dns dns_ali -d *.luode.vip
+# 生成根域名和所有子域名
+acme.sh --issue --dns dns_ali -d "luode.vip" -d "*.luode.vip"
 ```
 
 ```sh
-[Thu May 16 23:01:46 CST 2024] Your cert is in: /root/.acme.sh/*.luode.vip_ecc/*.luode.vip.cer
-[Thu May 16 23:01:46 CST 2024] Your cert key is in: /root/.acme.sh/*.luode.vip_ecc/*.luode.vip.key
-[Thu May 16 23:01:46 CST 2024] The intermediate CA cert is in: /root/.acme.sh/*.luode.vip_ecc/ca.cer
-[Thu May 16 23:01:46 CST 2024] And the full chain certs is there: /root/.acme.sh/*.luode.vip_ecc/fullchain.cer
+[Sun Jun  8 11:31:22 UTC 2025] Your cert is in: /root/.acme.sh/luode.vip_ecc/luode.vip.cer
+[Sun Jun  8 11:31:22 UTC 2025] Your cert key is in: /root/.acme.sh/luode.vip_ecc/luode.vip.key
+[Sun Jun  8 11:31:22 UTC 2025] The intermediate CA cert is in: /root/.acme.sh/luode.vip_ecc/ca.cer
+[Sun Jun  8 11:31:22 UTC 2025] And the full-chain cert is in: /root/.acme.sh/luode.vip_ecc/fullchain.cer
 ```
 
 到此位置, 证书就生成成功了
@@ -93,13 +94,13 @@ acme.sh --issue --dns dns_ali -d *.luode.vip
 mkdir -p /usr/local/src/nginx/ssl
 
 # 二进制nginx
-acme.sh --installcert -d '*.luode.vip' \
+acme.sh --installcert -d 'luode.vip' \
 --key-file /etc/nginx/ssl/luode.vip.key  \
 --fullchain-file /etc/nginx/ssl/luode.vip.pem \
 --reloadcmd "systemctl restart nginx"
 
 # docker nginx
-acme.sh --installcert -d '*.luode.vip' \
+acme.sh --installcert -d 'luode.vip' \
 --key-file /usr/local/src/nginx/ssl/luode.vip.key  \
 --fullchain-file /usr/local/src/nginx/ssl/luode.vip.pem \
 --reloadcmd "docker restart nginx"
