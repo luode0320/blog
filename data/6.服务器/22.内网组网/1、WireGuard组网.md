@@ -2,6 +2,8 @@
 
 WireGuard **默认对所有流量进行端到端加密**，即使数据在私有网络（如 `10.0.0.0/24`）中传输也会加密。
 
+注意: WireGuard 会被中国防火墙干扰, 可能会跑不通。
+
 
 
 **在3台服务器上安装WireGuard**：
@@ -41,18 +43,20 @@ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING 
 [Peer]
 PublicKey = <河北服务器的publickey>
 AllowedIPs = 10.0.0.2/32
+PersistentKeepalive = 10
 EOF
 
 [Peer]
 PublicKey = <上海服务器的publickey>
 AllowedIPs = 10.0.0.3/32
+PersistentKeepalive = 10
 EOF
 ```
 
 ```sh
 # 服务端需启用ip转发
-echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
-sudo sysctl -p
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+sysctl --system
 ```
 
 
@@ -70,7 +74,7 @@ PrivateKey = <河北服务器的privatekey>
 PublicKey = <香港服务器的publickey>
 AllowedIPs = 10.0.0.0/24
 Endpoint = 香港服务器公网IP:8333
-PersistentKeepalive = 25
+PersistentKeepalive = 10
 EOF
 ```
 
@@ -85,7 +89,7 @@ PrivateKey = <上海服务器的privatekey>
 PublicKey = <香港服务器的publickey>
 AllowedIPs = 10.0.0.0/24
 Endpoint = 香港服务器公网IP:8333
-PersistentKeepalive = 25
+PersistentKeepalive = 10
 EOF
 ```
 
