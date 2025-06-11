@@ -104,6 +104,10 @@ sudo systemctl status wg-quick@wg0
 
 # 重启使用
 sudo systemctl restart wg-quick@wg0
+# 停止当前运行的 WireGuard 服务
+sudo systemctl stop wg-quick@wg0
+# 禁用开机自启
+sudo systemctl disable wg-quick@wg0
 ```
 
 
