@@ -3,6 +3,12 @@
 安装需要的软件驱动
 
 ```shell
+# 下载阿里云镜像源配置
+sudo mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+sudo curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+# 清除缓存并重建
+sudo yum clean all
+sudo yum makecache
 yum install -y yum-utils device-mapper-persistent-data lvm2
 ```
 

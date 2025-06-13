@@ -33,13 +33,6 @@ proxies:
     password: Ld@588588 # 香港服务器vpn密码
     cipher: aes-256-gcm # 香港服务器vpn加密算法
     udp: true  # 允许 UDP 流量
-  - name: "美国住宅代理"  # 代理名称（可自定义）
-    type: socks5
-    server: static-us8-gate.ipweb.cc  # 代理服务器地址
-    port: 7778  # 端口
-    username: lelaniyona2694_US_LosAngeles_kk2art51  # 用户名
-    password: mhvuv2  # 密码
-    udp: true  # 如果需要UDP支持
     
 proxy-groups:
   - name: Proxy
@@ -49,7 +42,6 @@ proxy-groups:
     tolerance: 100      # 延迟相差100ms以内不切换
     proxies:
       - vpn
-      - "美国住宅代理"
   - name: Direct
     type: select
     proxies:
