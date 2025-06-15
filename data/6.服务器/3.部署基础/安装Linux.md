@@ -124,3 +124,13 @@ reboot
 右键属性, 点击ipv4
 
 ![image-20250412140043605](../../picture/image-20250412140043605.png)
+
+# 清理虚拟机磁盘
+
+有时候虚拟机的磁盘已经清理了, 但是windwos的磁盘还是被占用, 需要清理
+
+```sh
+sudo /usr/bin/vmware-toolbox-cmd disk list
+sudo /usr/bin/vmware-toolbox-cmd disk shrink /
+```
+
