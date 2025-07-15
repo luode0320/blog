@@ -20,7 +20,7 @@ FROM (
     FROM 
         orders
     WHERE 
-        time_type = '1h' AND order_type = '多'
+        time_type = '30m'
     GROUP BY 
         DAYOFWEEK(create_time)
 ) AS daily_win_rates
@@ -28,6 +28,31 @@ GROUP BY
     day_of_week
 ORDER BY 
     day_of_week;
+    
+    
+# 每个星期的胜率
+SELECT 
+    DATE(create_time) AS order_date,
+    CASE 
+        WHEN DAYOFWEEK(create_time) = 1 THEN '星期日'
+        WHEN DAYOFWEEK(create_time) = 2 THEN '星期一'
+        WHEN DAYOFWEEK(create_time) = 3 THEN '星期二'
+        WHEN DAYOFWEEK(create_time) = 4 THEN '星期三'
+        WHEN DAYOFWEEK(create_time) = 5 THEN '星期四'
+        WHEN DAYOFWEEK(create_time) = 6 THEN '星期五'
+        WHEN DAYOFWEEK(create_time) = 7 THEN '星期六'
+    END AS weekday,
+    COUNT(*) AS total_orders,
+    SUM(CASE WHEN order_result = '赢' THEN 1 ELSE 0 END) / COUNT(*) * 100 AS win_rate_percentage
+FROM 
+    orders
+WHERE 
+    time_type = '30m'
+GROUP BY 
+    DATE(create_time), 
+    DAYOFWEEK(create_time)
+ORDER BY 
+    weekday;
 ```
 
 
@@ -45,7 +70,7 @@ SELECT
 FROM 
     orders
 WHERE 
-    time_type = '1h'
+    time_type = '30m'
 GROUP BY 
     time_period
 ORDER BY 
@@ -70,7 +95,7 @@ SELECT
 FROM 
     orders
 WHERE 
-    time_type = '1h'
+    time_type = '30m'
 GROUP BY 
     time_period
 ORDER BY 
@@ -92,7 +117,7 @@ SELECT
 FROM 
     orders
 WHERE 
-    time_type = '1h'
+    time_type = '30m'
 GROUP BY 
     hour_of_day
 ORDER BY 
@@ -119,7 +144,7 @@ SELECT
 FROM 
     orders
 WHERE 
-    time_type = '10m'
+    time_type = '30m'
 GROUP BY 
     HOUR(create_time),
     CASE WHEN MINUTE(create_time) < 30 THEN 0 ELSE 1 END
@@ -127,6 +152,38 @@ ORDER BY
     AVG(CASE WHEN order_result = '赢' THEN 1 ELSE 0 END) DESC,  -- 按实际数值排序
     HOUR(create_time),
     CASE WHEN MINUTE(create_time) < 30 THEN 0 ELSE 1 END;
+    
+    
+SELECT 
+    CONCAT(
+        LPAD(HOUR(create_time), 2, '0'), 
+        ':00-', 
+        LPAD(MOD(HOUR(create_time) + 1, 24), 2, '0'), 
+        ':00'
+    ) AS '时间段',
+    COUNT(*) AS '下单数',
+    ROUND(AVG(CASE WHEN order_result = '赢' THEN 1 ELSE 0 END) * 100, 2) AS '平均胜率(%)'
+FROM 
+    orders
+WHERE 
+    time_type = '30m'
+GROUP BY 
+    HOUR(create_time)
+ORDER BY 
+    `平均胜率(%)` DESC,  -- 按胜率降序排列
+    HOUR(create_time);
+18:00-19:00	32	71.88
+02:00-03:00	26	69.23
+01:00-02:00	27	66.67
+08:00-09:00	30	66.67
+04:00-05:00	25	64.00
+10:00-11:00	33	63.64
+09:00-10:00	31	61.29
+
+06:00-07:00	21	42.86
+07:00-08:00	28	39.29
+21:00-22:00	51	35.29
+    
 ```
 
 ```
