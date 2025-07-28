@@ -16,6 +16,7 @@ redis-cli -p 6379 GET "CoinsAllowOrder" # 获取币种Logo
 
 redis-cli -p 6379 --scan --pattern "XRP-trustLines:*" | head -10 | xargs -I {} redis-cli -p 6379 GET {}  # 查询10条某前缀的key
 
+docker exec -it redis redis-cli -p 6379 GET "token_prices_redis_key"  > prices.txt 
 ```
 
 

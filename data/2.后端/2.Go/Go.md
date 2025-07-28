@@ -100,3 +100,21 @@ go build -o heiheihei.exe
 go run main.go
 ```
 
+### 12.清理 Go 模块缓存
+
+```sh
+go clean -modcache
+```
+
+### 13.清理构建缓存
+
+```sh
+go clean -cache
+```
+
+### 14.清理未使用的导入
+
+```sh
+go mod tidy -v
+```
+

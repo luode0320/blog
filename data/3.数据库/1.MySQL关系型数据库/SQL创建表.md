@@ -12,6 +12,7 @@ CREATE TABLE `exchange_cancel_coins` (
   `createTime` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updateTime` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
-  KEY `idx_exchangeName` (`exchangeName`) USING BTREE COMMENT '交易所名称索引'
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='交易所下架兑换币种';
+  UNIQUE KEY `idx_exchangeName` (`exchangeName`) USING BTREE COMMENT '交易所唯一索引',
+  KEY `idx_name` (`name`) USING BTREE COMMENT '名称索引',
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='交易所下架兑换币种';
 ```

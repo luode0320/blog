@@ -25,3 +25,20 @@ public function transaction(Request $request)
 [2024-10-24 06:13:34] ServerDev.INFO: 转账 transaction or transactionMax =  {"address":"Ey4cy88yzRbNU5ebjG4fFvEJ9EgbZYgjsQs6jdM2HbW6","status":false,"msg":"请稍候重试！","code":10001,"data":[]}
 ```
 
+
+
+# 更新状态和tx
+
+![image-20250626094504282](../../../picture/image-20250626094504282.png)
+
+```php
+//如果是兑换，更新订单信息
+if (!empty($orderID) && strpos($orderID, 'ewtn') === 0) {
+    $rst = Order::upOrder($orderID, ['tx' => $txid, 'status' => 2]);
+    if (!$rst) {
+        transactionLogInfo("transaction",$httpType,$fileNameTime,$request->ip(),$request->all(),$url,$postDataArray,$response,'upOrderError');
+        return response()->json(trJsonMsg(false, trans('gLang.upOrderError', [], $gLang), config('errorcode.upOrderError'),$cAddress));
+    }
+}
+```
+
