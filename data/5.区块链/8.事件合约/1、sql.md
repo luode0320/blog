@@ -53,6 +53,86 @@ GROUP BY
     DAYOFWEEK(create_time)
 ORDER BY 
     weekday;
+    
+# 两个时间段：0:00 - 12:00（上午） 12:00 - 24:00（下午/晚上）
+SELECT 
+    CASE 
+        WHEN day_of_week = 1 THEN '星期日'
+        WHEN day_of_week = 2 THEN '星期一'
+        WHEN day_of_week = 3 THEN '星期二'
+        WHEN day_of_week = 4 THEN '星期三'
+        WHEN day_of_week = 5 THEN '星期四'
+        WHEN day_of_week = 6 THEN '星期五'
+        WHEN day_of_week = 7 THEN '星期六'
+    END AS weekday,
+    time_period,
+    total_orders,
+    ROUND(avg_win_rate * 100, 2) AS avg_win_rate_percent
+FROM (
+    SELECT 
+        DAYOFWEEK(create_time) AS day_of_week,
+        CASE 
+            WHEN HOUR(create_time) < 12 THEN '00:00-12:00'
+            ELSE '12:00-24:00'
+        END AS time_period,
+        COUNT(*) AS total_orders,
+        AVG(CASE WHEN order_result = '赢' THEN 1.0 ELSE 0.0 END) AS avg_win_rate
+    FROM 
+        orders
+    WHERE 
+        time_type = '30m'
+        AND create_time IS NOT NULL
+    GROUP BY 
+        DAYOFWEEK(create_time),
+        CASE 
+            WHEN HOUR(create_time) < 12 THEN '00:00-12:00'
+            ELSE '12:00-24:00'
+        END
+) AS grouped_data
+ORDER BY 
+    day_of_week, 
+    time_period;
+    
+# 00:00 - 08:00（凌晨） 08:00 - 16:00（上午+下午） 16:00 - 24:00（傍晚+晚上）
+SELECT 
+    CASE 
+        WHEN day_of_week = 1 THEN '星期日'
+        WHEN day_of_week = 2 THEN '星期一'
+        WHEN day_of_week = 3 THEN '星期二'
+        WHEN day_of_week = 4 THEN '星期三'
+        WHEN day_of_week = 5 THEN '星期四'
+        WHEN day_of_week = 6 THEN '星期五'
+        WHEN day_of_week = 7 THEN '星期六'
+    END AS weekday,
+    time_period,
+    total_orders,
+    ROUND(avg_win_rate * 100, 2) AS avg_win_rate_percent
+FROM (
+    SELECT 
+        DAYOFWEEK(create_time) AS day_of_week,
+        CASE 
+            WHEN HOUR(create_time) < 8  THEN '00:00-08:00'
+            WHEN HOUR(create_time) < 16 THEN '08:00-16:00'
+            ELSE '16:00-24:00'
+        END AS time_period,
+        COUNT(*) AS total_orders,
+        AVG(CASE WHEN order_result = '赢' THEN 1.0 ELSE 0.0 END) AS avg_win_rate
+    FROM 
+        orders
+    WHERE 
+        time_type = '30m'
+        AND create_time IS NOT NULL
+    GROUP BY 
+        DAYOFWEEK(create_time),
+        CASE 
+            WHEN HOUR(create_time) < 8  THEN '00:00-08:00'
+            WHEN HOUR(create_time) < 16 THEN '08:00-16:00'
+            ELSE '16:00-24:00'
+        END
+) AS grouped_data
+ORDER BY 
+    day_of_week, 
+    FIELD(time_period, '00:00-08:00', '08:00-16:00', '16:00-24:00');
 ```
 
 
@@ -80,7 +160,7 @@ ORDER BY
         WHEN time_period = '16-24点' THEN 3
     END;
     
-# 
+# 每4小时
 SELECT 
     CASE 
         WHEN HOUR(create_time) BETWEEN 0 AND 3 THEN '0-4点'
@@ -108,7 +188,7 @@ ORDER BY
         WHEN time_period = '20-24点' THEN 6
     END;
 
-
+# 每小时
 SELECT 
     HOUR(create_time) AS hour_of_day,
     CONCAT(HOUR(create_time), ':00-', HOUR(create_time)+1, ':00') AS time_period,
